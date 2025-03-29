@@ -25,5 +25,5 @@ trains_connecting = trains_today.connecting('Station A ID', 'Station B ID')
 print(trains_connecting)
 
 utd.save('path/to/utd')
-u = UTD.load('path/to/utd')
+u = bt.UTD.load('path/to/utd')
 ```
