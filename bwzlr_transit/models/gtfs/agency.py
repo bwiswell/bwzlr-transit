@@ -32,7 +32,7 @@ class Agency:
     
     ### ATTRIBUTES ###
     # Model ID
-    id: str = d.field(m.fields.String(data_key='agency_id'))
+    id: str = d.field(m.fields.String(data_key='agency_id', missing=''))
     '''the unique ID of the transit agency'''
     
     # Required fields
