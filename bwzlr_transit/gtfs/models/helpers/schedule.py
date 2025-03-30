@@ -25,12 +25,13 @@ class Schedule:
     '''
 
     ### ATTRIBUTES ###
+    # Required fields
     additions: list[pydate]
     '''a list of dates on which additional service is offered'''
-    exceptions: list[pydate]
-    '''a list of dates on which service is suspended'''
     calendars: list[Calendar]
     '''a list of `Calendar` records associated with the service'''
+    exceptions: list[pydate]
+    '''a list of dates on which service is suspended'''
 
 
     ### CLASS METHODS ###
