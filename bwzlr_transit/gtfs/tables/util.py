@@ -18,13 +18,16 @@ def load_table (
     Reads the contents of a table in CSV format and deserializes its contents.
 
     Parameters:
-        path (str): the path of the CSV file to load data from
-        schema (marshmallow.Schema): the Schema for the table's records
-        key_fn (KeyGetter): a function that extracts a key from a record
+        path (str):
+            the path of the CSV file to load data from
+        schema (marshmallow.Schema):
+            the Schema for the table's records
+        key_fn (KeyGetter):
+            a function that extracts a key from a record
 
     Returns:
-        data (dict[str, T]): a dictionary mapping `str` keys to deserialized 
-        record objects
+        data (dict[str, T]):
+            a dictionary mapping `str` keys to deserialized record objects
     '''
     
     df = pd.read_csv(path, dtype=str).fillna('')

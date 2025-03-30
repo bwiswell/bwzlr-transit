@@ -18,9 +18,12 @@ class CalendarDate:
     Defines an exception to the service patterns defined in `calendar.txt`.
 
     Attributes:
-        date (date): the date when the service exception occurs
-        exception (ExceptionType): the type of service exception specified
-        service_id (str): the ID of the service the calendar date modifies
+        date (date):
+            the date when the service exception occurs
+        exception (ExceptionType):
+            the type of service exception specified
+        service_id (str):
+            the ID of the service the calendar date modifies
     '''
 
     # Foreign IDs
@@ -33,13 +36,7 @@ class CalendarDate:
     exception: ExceptionType = d.field(
         m.fields.Enum(ExceptionType, data_key='exception_type', by_value=True)
     )
-    '''
-    The type of service exception specified. Indicates whether service is 
-    avilable on `date`. Valid options are:
-    
-    `1` - Service has been added for the specified date.\n    
-    `2` - Service has been removed for the specified date.
-    '''
+    '''the type of service exception specified'''
 
 
 CALENDAR_DATE_SCHEMA = d.schema(CalendarDate)

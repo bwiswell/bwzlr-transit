@@ -15,9 +15,12 @@ class Agencies:
     A dataclass table mapping `str` IDs to `Agency` records.
 
     Attributes:
-        agencies (list[Agency]): a list of all `Agency` records in the table
-        agency_ids (list[str]): a list of all `Agency.id` values in the table
-        data (dict[str, Agency]): a dict mapping `str` IDs to `Agency` records
+        agencies (list[Agency]):
+            a list of all `Agency` records in the table
+        agency_ids (list[str]):
+            a list of all `Agency.id` values in the table
+        data (dict[str, Agency]):
+            a dict mapping `str` IDs to `Agency` records
     '''
 
     ### ATTRIBUTES ###
@@ -30,11 +33,13 @@ class Agencies:
         Returns the `Agency` record associated with `id`.
 
         Parameters:
-            id (str): the agency ID to match against `Agency.id`
+            id (str):
+                the agency ID to match against `Agency.id`
 
         Returns:
-            agency (Optional[Agency]): the `Agency` record associated with 
-            `id`, or `None` if no matching record exists
+            agency (Optional[Agency]):
+                the `Agency` record associated with `id`, or `None` if no \
+                matching record exists
         '''
         return self.data.get(id, None)
 
@@ -47,11 +52,12 @@ class Agencies:
         found at `<dataset_path>/agency.txt`.
 
         Parameters:
-            dataset_path (str): the path to the GTFS dataset
+            dataset_path (str):
+                the path to the GTFS dataset
 
         Returns:
-            agencies (Agencies): a dataclass table mapping `str` IDs to 
-            `Agency` records
+            agencies (Agencies):
+                a dataclass table mapping `str` IDs to `Agency` records
         '''
         return Agencies(
             load_table(
@@ -85,11 +91,13 @@ class Agencies:
         Returns the `Agency` record associated with `name`.
 
         Parameters:
-            name (str): the agency name to match against `Agency.name`
+            name (str):
+                the agency name to match against `Agency.name`
 
         Returns:
-            agency (Optional[Agency]): the `Agency` record associated with 
-            `name`, or `None` if no matching record exists
+            agency (Optional[Agency]):
+                the `Agency` record associated with `name`, or `None` if no \
+                matching record exists
         '''
         for agency in self.agencies:
             if agency.name == name: 

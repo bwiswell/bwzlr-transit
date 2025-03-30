@@ -1,3 +1,6 @@
-from .agency import Agency, AGENCY_SCHEMA
-from .calendar_date import CalendarDate, ExceptionType, CALENDAR_DATE_SCHEMA
-from .feed import Feed, FEED_SCHEMA
+from .gtfs import (
+    Agency, AGENCY_SCHEMA,
+    CalendarDate, CALENDAR_DATE_SCHEMA,
+    Feed, FEED_SCHEMA,
+)
+from .schedule import Schedule

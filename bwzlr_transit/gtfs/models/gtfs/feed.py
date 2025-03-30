@@ -13,22 +13,24 @@ class Feed:
     GTFS dataset and publisher.
 
     Attributes:
-        contact_email (Optional[str]): the email address for communication \
-            regarding the GTFS dataset
-        contact_url (Optional[str]): the URL for information regarding the \
-            GTFS dataset
-        default_lang (Optional[str]): the language to use when the rider's \
-            language is unknown
-        end_date (Optional[date]): the end date of the information provided in \
-            the GTFS dataset
-        lang (str): the default language used for the text in this dataset
-        publisher_name (str): the name of the organization that publishes the \
-            dataset
-        publisher_url (str): the url of the dataset publishing organization's \
-            website
-        start_date (Optional[date]): the start date of the information \
-            provided in the GTFS dataset
-        version (str): the current version of the GTFS dataset
+        contact_email (Optional[str]):
+            the email address for communication regarding the GTFS dataset
+        contact_url (Optional[str]):
+            the URL for information regarding the GTFS dataset
+        default_lang (Optional[str]):
+            the language to use when the rider's language is unknown
+        end_date (Optional[date]):
+            the end date of the information provided in the GTFS dataset
+        lang (str):
+            the default language used for the text in this dataset
+        publisher_name (str):
+            the name of the organization that publishes the dataset
+        publisher_url (str):
+            the url of the dataset publishing organization's website
+        start_date (Optional[date]):
+            the start date of the information provided in the GTFS dataset
+        version (str):
+            the current version of the GTFS dataset
     '''
 
     # Required fields

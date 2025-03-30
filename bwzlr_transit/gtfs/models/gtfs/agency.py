@@ -12,15 +12,22 @@ class Agency:
     transit agency.
 
     Attributes:
-        id (str): the unique ID of the transit agency
-        email (Optional[str]): the customer service email of the transit agency
-        fare_url (Optional[str]): the URL of a fare or ticket website for the \
-            transit agency
-        lang (str): the primary language used by the transit agency
-        name (str): the name of the transit agency
-        phone (str): the voice telephone number for the transit agency
-        timezone (str): the timezone where the transit agency is located
-        url (str): the URL of the transit agency
+        id (str):
+            the unique ID of the transit agency
+        email (Optional[str]):
+            the customer service email of the transit agency
+        fare_url (Optional[str]):
+            the URL of a fare or ticket website for the transit agency
+        lang (str):
+            the primary language used by the transit agency
+        name (str):
+            the name of the transit agency
+        phone (str):
+            the voice telephone number for the transit agency
+        timezone (str):
+            the timezone where the transit agency is located
+        url (str):
+            the URL of the transit agency
     '''
     
     # Model ID
