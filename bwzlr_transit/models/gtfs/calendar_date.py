@@ -19,7 +19,7 @@ class CalendarDate:
 
     Attributes:
         service_id (str):
-            the ID of the service the calendar date modifies
+            the unique ID of the service the calendar date modifies
         date (date):
             the date when the service exception occurs
         exception (ExceptionType):
@@ -29,7 +29,7 @@ class CalendarDate:
     ### ATTRIBUTES ###
     # Foreign IDs
     service_id: str = d.field(m.fields.String(data_key='service_id'))
-    '''the ID of the service the calendar date modifies'''
+    '''the unique ID of the service the calendar date modifies'''
     
     # Required fields
     date: pydate = d.field(m.fields.Date(data_key='date', format='%Y%m%d'))

@@ -37,11 +37,11 @@ class Stop:
         id (str):
             the unique ID of the transit location
         level_id (Optional[str]):
-            the level of the transit location
+            the unique ID of the level of the transit location
         parent_id (Optional[str]):
             the unique ID of the transit location's parent
         zone_id (Optional[str]):
-            the fare zone ID of the transit location
+            the unique ID of the fare zone ID of the transit location
         accessibility (Accessibility):
             the `Accessibility` of the transit location for wheelchair \
             boardings
@@ -53,7 +53,7 @@ class Stop:
             the latitude of the transit location
         lon (Optional[float]):
             the longitude of the transit location
-        name (str):
+        name (str = 'unnamed'):
             the name of the transit location
         platform_code (Optional[str]):
             the unique ID of the platform to stop at
@@ -76,7 +76,7 @@ class Stop:
     level_id: Optional[str] = d.field(
         m.fields.String(data_key='level_id', missing=None)
     )
-    '''the level of the transit location'''
+    '''the unique ID of the level of the transit location'''
     parent_id: Optional[str] = d.field(
         m.fields.String(data_key='parent_station', missing=None)
     )
@@ -84,7 +84,7 @@ class Stop:
     zone_id: Optional[str] = d.field(
         m.fields.String(data_key='zone_id', missing=None)
     )
-    '''the unique ID of the transit location's fare zone'''
+    '''the unique ID of the fare zone of the transit location'''
 
     # Required fields
     accessibility: Accessibility = d.field(
@@ -123,8 +123,8 @@ class Stop:
         m.fields.Float(data_key='stop_lon', missing=None)
     )
     '''the longitude of the transit location'''
-    name: Optional[str] = d.field(
-        m.fields.String(data_key='stop_name', missing=None)
+    name: str = d.field(
+        m.fields.String(data_key='stop_name', missing='unnamed')
     )
     '''the name of the transit location'''
     platform_code: Optional[str] = d.field(
