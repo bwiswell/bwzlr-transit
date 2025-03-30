@@ -1,3 +1,3 @@
 from .agencies import Agencies
-from .services import Services
+from .schedules import Schedules
 from .stops import Stops

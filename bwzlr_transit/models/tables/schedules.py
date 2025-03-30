@@ -16,7 +16,7 @@ from ..util import load_list
 
 
 @dataclass
-class Services:
+class Schedules:
     '''
     A dataclass table mapping `str` IDs to `Schedule` records.
 
@@ -35,9 +35,9 @@ class Services:
 
     ### CLASS METHODS ###
     @classmethod
-    def load (cls, dataset_path: str) -> Services:
+    def load (cls, dataset_path: str) -> Schedules:
         '''
-        Returns an `Services` table containing all of the `Schedule` records 
+        Returns a `Schedules` table containing all of the `Schedule` records 
         compiled from the `Calendar` records in `<dataset_path>/calendar.txt` 
         and the `CalendarDate` records in `<dataset_path>/calendar_dates.txt`.
 
@@ -46,7 +46,7 @@ class Services:
                 the path to the GTFS dataset
 
         Returns:
-            services (Services):
+            schedules (Schedules):
                 a dataclass table mapping `str` IDs to `Schedule` records
         '''
         calendars: list[Calendar] = load_list(
@@ -62,7 +62,7 @@ class Services:
             [c.service_id for c in calendars] + [cd.service_id for cd in dates]
         )
 
-        return Services({
+        return Schedules({
             sid: Schedule(
                 additions = [
                     cd for cd in dates 
