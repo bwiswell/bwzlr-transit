@@ -14,37 +14,28 @@ class ExceptionType(Enum):
 @dataclass
 class CalendarDate:
     '''
-    Used in conjunction with `Calendar` to define exceptions to the default 
-    service patterns defined in `calendar.txt`. If service is generally 
-    regular, with a few changes on explicit dates (for instance, to accomodate 
-    special event services, or a school schedule), this is a good approach. In 
-    this case `calendar_dates.service_id` is a foreign ID referencing 
-    `calendar.service_id`. Alternatively, omit `calendar.txt` and specify each 
-    date of service in `calendar_dates.txt`. This allows for considerable 
-    service variation and accommodates service without normal weekly 
-    schedules. In this case `service_id` is an ID.
+    A GTFS dataclass model for records found in `calendar_dates.txt`. 
+    Defines an exception to the service patterns defined in `calendar.txt`.
+
+    Attributes:
+        date (date): the date when the service exception occurs
+        exception (ExceptionType): the type of service exception specified
+        service_id (str): the ID of the service the calendar date modifies
     '''
 
     # Foreign IDs
     service_id: str = d.field(m.fields.String(data_key='service_id'))
-    '''
-    Identifies a set of dates when a service exception occurs for one or more 
-    routes. Each (`service_id`, `date`) pair may only appear once in 
-    `calendar_dates.txt` if using `calendar.txt` and `calendar_dates.txt` in 
-    conjunction. If a `service_id` value appears in both `calendar.txt` and 
-    `calendar_dates.txt`, the information in `calendar_dates.txt` modifies the 
-    service information specified in `calendar.txt`.
-    '''
+    '''the ID of the service the calendar date modifies'''
     
     # Required fields
     date: pydate = d.field(m.fields.Date(data_key='date', format='%Y%m%d'))
-    '''Date when service exception occurs.'''
+    '''the date when the service exception occurs'''
     exception: ExceptionType = d.field(
         m.fields.Enum(ExceptionType, data_key='exception_type', by_value=True)
     )
     '''
-    Indicates whether service is avilable on the date specified in the date 
-    field. Valid options are:
+    The type of service exception specified. Indicates whether service is 
+    avilable on `date`. Valid options are:
     
     `1` - Service has been added for the specified date.\n    
     `2` - Service has been removed for the specified date.
