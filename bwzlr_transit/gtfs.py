@@ -4,9 +4,8 @@ from typing import Any, Callable
 from marshmallow import Schema
 import pandas as pd
 
-from .agency import Agency, AGENCY_SCEMA
-from .caldate import CalDate, CALDATE_SCHEMA
-from .feed import Feed, FEED_SCHEMA
+from . import models as m
+
 from .route import Route, ROUTE_SCHEMA
 from .schedule import Schedule, SCHEDULE_SCHEMA
 from .shape import Shape, SHAPE_SCHEMA
@@ -20,7 +19,7 @@ class GTFS:
         self.name = name
         self.path = path
 
-        self.agency: Agency = self._load('agency', AGENCY_SCEMA)[0]
+        self.agency: m.Agency = self._load('agency', m.AGENCY_SCEMA)
         self.feed: Feed = self._load('feed_info', FEED_SCHEMA)[0]
 
         self.calendar: dict[str, Schedule] = self._load_dict('calendar', SCHEDULE_SCHEMA, lambda cd: cd.service_id)
