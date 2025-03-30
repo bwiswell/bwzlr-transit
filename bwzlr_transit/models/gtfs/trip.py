@@ -67,27 +67,27 @@ class Trip:
 
     # Required fields
     accessibility: Accessibility = d.field(
-        m.fields.Enum(
-            Accessibility,
-            by_value=True,
+        m.fields.Function(
+            deserialize=lambda a: Accessibility(int(a)),
             data_key='wheelchair_accessible',
             missing=Accessibility.UNKNOWN
         )
     )
     '''the `Accessibility` of the trip'''
     bikes: BikesAllowed = d.field(
-        m.fields.Enum(
-            BikesAllowed,
-            by_value=True,
+        m.fields.Function(
+            deserialize=lambda ba: BikesAllowed(int(ba)),
             data_key='bikes_allowed',
-            missing=BikesAllowed.UNKNOWN
+            load_default=BikesAllowed.UNKNOWN,
+            missing=None,
+            required=False
         )
     )
     '''the `BikesAllowed` of the trip'''
 
     # Optional fields
     direction: Optional[bool] = d.field(
-        m.fields.Boolean(data_key='direction', missing=None)
+        m.fields.Boolean(data_key='direction_id', missing=None)
     )
     '''the direction of the trip'''
     headsign: Optional[str] = d.field(

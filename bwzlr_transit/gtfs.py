@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import date as pydate, time
 import os
+from typing import Callable
 
 from marshmallow import Schema
 
@@ -51,20 +53,23 @@ class GTFS:
     ### CLASS METHODS ###
     @classmethod
     def load (cls, name: str, path: str) -> GTFS:
+        print('loading agencies...')
         agencies = {
             a.id: a for a in GTFS.load_list(
                 os.path.join(path, 'agency.txt'), g.AGENCY_SCHEMA
             )
         }
+        print('loading feed info...')
         feed = GTFS.load_list(
             os.path.join(path, 'feed_info.txt'), g.FEED_SCHEMA
         )[0]
+        print('loading routes...')
         routes = {
             r.id: r for r in GTFS.load_list(
                 os.path.join(path, 'routes.txt'), g.ROUTE_SCHEMA
             )
         }
-
+        print('loading schedules...')
         calendars: list[g.Calendar] = GTFS.load_list(
             os.path.join(path, 'calendar.txt'), g.CALENDAR_SCHEMA
         )
@@ -89,10 +94,11 @@ class GTFS:
                 ]
             ) for sid in service_ids
         }
-
+        print('loading stop times...')
         stop_times: list[g.StopTime] = GTFS.load_list(
             os.path.join(path, 'stop_times.txt'), g.STOP_TIME_SCHEMA
         )
+        print('loading trips...')
         trips: list[g.Trip] = [
             h.Trip.from_gtfs(trip, stop_times) for trip in GTFS.load_list(
                 os.path.join(path, 'trips.txt'), g.TRIP_SCHEMA
@@ -125,16 +131,66 @@ class GTFS:
             records (list[T]):
                 a list of deserialized records
         '''
+        print('\treading data from CSV...')
         data: list[str]
         with open(path, 'r') as file:
             data = file.readlines()
 
         header = data[0].rstrip().split(',')
-        data = [l.rstrip().split(',') for l in data[1:]]
+        print('\tparsing data...')
+        records = []
+        for line in data[1:]:
+            if len(line) == 0: continue
+            records.append(
+                schema.load({
+                    h: v if len(v) > 0 else None
+                    for h, v in zip(
+                        header,
+                        line.rstrip().split(',')
+                    )
+                })
+            )
+        return records
+    
 
-        return [
-            schema.load({ 
-                head: val 
-                for head, val in zip(header, values) 
-            }) for values in data
-        ]
+    ### METHODS ###        
+    def filtered (self, filter: Callable[[h.Trip], bool]) -> GTFS:
+        '''
+        Returns a GTFS dataset filtered according to `filter`
+
+        Parameters:
+            filter (Callable[[Trip], bool]):
+                the filter to use on the GTFS dataset
+        
+        Returns:
+            gtfs (GTFS):
+                a GTFS dataset filtered according to `filter`
+        '''
+        return GTFS(
+            agencies=self.agencies,
+            feed=self.feed,
+            name=self.name,
+            path=self.path,
+            routes=self.routes,
+            schedules=self.schedules,
+            trips={
+                trip.id: trip for trip in self.trips.values()
+                if filter(trip)
+            }
+        )
+    
+    def on (self, date: pydate) -> GTFS:
+        '''
+        Return a GTFS dataset containing only the trips starting on `date`.
+
+        Parameters:
+            date (date):
+                the date to filter the GTFS to
+
+        Returns:
+            gtfs (GTFS):
+                the filtered GTFS dataset
+        '''
+        return self.filtered(
+            lambda t: self.schedules[t.service_id].active(date)
+        )

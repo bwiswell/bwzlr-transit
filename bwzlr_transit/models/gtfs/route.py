@@ -102,7 +102,10 @@ class Route:
     )
     '''the color to use for text drawn against `Route.color`'''
     type: TransitType = d.field(
-        m.fields.Enum(TransitType, by_value=True, data_key='route_type')
+        m.fields.Function(
+            deserialize=lambda t: TransitType(int(t)), 
+            data_key='route_type'
+        )
     )
     '''the `TransitType` of the route'''
 

@@ -111,10 +111,9 @@ class StopTime:
     index: int = d.field(m.fields.Integer(data_key='stop_sequence'))
     '''the sequence index of the stop'''
     timepoint: Timepoint = d.field(
-        m.fields.Enum(
-            Timepoint, 
-            by_value=True, 
-            data_key='timepoint', 
+        m.fields.Function(
+            deserialize=lambda t: Timepoint(int(t)), 
+            data_key='timepoint',
             missing=Timepoint.EXACT
         )
     )
@@ -134,18 +133,16 @@ class StopTime:
     )
     '''the distance traveled from the first stop until this stop'''
     dropoff_continuity: Optional[StopContinuity] = d.field(
-        m.fields.Enum(
-            StopContinuity,
-            by_value=True,
-            data_key='dropoff_pickup',
+        m.fields.Function(
+            deserialize=lambda dc: StopContinuity(int(dc)),
+            data_key='continuous_drop_off',
             missing=None
         )
     )
     '''the `StopContinuity` for dropoffs at the stop'''
     dropoff_type: Optional[StopType] = d.field(
-        m.fields.Enum(
-            StopType, 
-            by_value=True, 
+        m.fields.Function(
+            deserialize=lambda dt: StopType(int(dt)),
             data_key='drop_off_type', 
             missing=None
         )
@@ -160,18 +157,16 @@ class StopTime:
     )
     '''the headsign to display when this stop is the destination'''
     pickup_continuity: Optional[StopContinuity] = d.field(
-        m.fields.Enum(
-            StopContinuity,
-            by_value=True,
+        m.fields.Function(
+            deserialize=lambda pc: StopContinuity(int(pc)),
             data_key='continuous_pickup',
             missing=None
         )
     )
     '''the `StopContinuity` for pickups at the stop'''
     pickup_type: Optional[StopType] = d.field(
-        m.fields.Enum(
-            StopType, 
-            by_value=True, 
+        m.fields.Function(
+            deserialize=lambda dt: StopType(int(dt)),
             data_key='pickup_type', 
             missing=None
         )
