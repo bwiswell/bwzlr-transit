@@ -5,7 +5,7 @@ import os
 from typing import Optional
 
 from ..gtfs import Stop, STOP_SCHEMA
-from ..util import load_table
+from ..util import load_list
 
 
 @dataclass
@@ -41,13 +41,12 @@ class Stops:
             stops (Stops):
                 a dataclass table mapping `str` IDs to `Stop` records
         '''
-        return Stops(
-            load_table(
-                path = os.path.join(dataset_path, 'stops.txt'),
-                schema = STOP_SCHEMA,
-                key_fn = lambda s: s.id
-            )
+        stops: list[Stop] = load_list(
+            path=os.path.join(dataset_path, 'stops.txt'),
+            schema=STOP_SCHEMA
         )
+
+        return Stops({ s.id: s for s in stops })
 
 
     ### MAGIC METHODS ###

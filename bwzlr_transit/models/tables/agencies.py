@@ -5,7 +5,7 @@ import os
 from typing import Optional
 
 from ..gtfs import Agency, AGENCY_SCHEMA
-from ..util import load_table
+from ..util import load_list
 
 
 @dataclass
@@ -28,12 +28,14 @@ class Agencies:
 
     ### CLASS METHODS ###
     @classmethod
-    def load (cls, dataset_path: str) -> Agencies:
+    def load (cls, dataset_name: str, dataset_path: str) -> Agencies:
         '''
         Returns an `Agencies` table containing all of the `Agency` records 
         found at `<dataset_path>/agency.txt`.
 
         Parameters:
+            dataset_name (str):
+                the name of the GTFS dataset
             dataset_path (str):
                 the path to the GTFS dataset
 
@@ -41,13 +43,15 @@ class Agencies:
             agencies (Agencies):
                 a dataclass table mapping `str` IDs to `Agency` records
         '''
-        return Agencies(
-            load_table(
-                path = os.path.join(dataset_path, 'agency.txt'),
-                schema = AGENCY_SCHEMA,
-                key_fn = lambda a: a.id
-            )
+        agencies: list[Agency] = load_list(
+            path=os.path.join(dataset_path, 'agency.txt'), 
+            schema=AGENCY_SCHEMA
         )
+
+        if len(agencies) == 1 and agencies[0].id == '':
+            agencies[0].id == dataset_name
+
+        return Agencies({ a.id: a for a in agencies })
 
 
     ### MAGIC METHODS ###
