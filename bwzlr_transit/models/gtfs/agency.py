@@ -18,11 +18,11 @@ class Agency:
             the customer service email of the transit agency
         fare_url (Optional[str]):
             the URL of a fare or ticket website for the transit agency
-        lang (str):
+        lang (Optional[str]):
             the primary language used by the transit agency
         name (str):
             the name of the transit agency
-        phone (str):
+        phone (Optional[str]):
             the voice telephone number for the transit agency
         timezone (str):
             the timezone where the transit agency is located

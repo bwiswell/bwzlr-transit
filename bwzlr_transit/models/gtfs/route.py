@@ -5,15 +5,7 @@ from typing import Optional
 import desert as d
 import marshmallow as m
 
-
-class StopContinuity(Enum):
-    '''
-    An `Enum` describing the stop continuity of the route.
-    '''
-    CONTINUOUS = 0
-    SCHEDULED = 1
-    VIA_PHONE = 2
-    VIA_DRIVER = 3
+from .stop_continuity import StopContinuity
 
 
 class TransitType(Enum):
@@ -91,13 +83,13 @@ class Route:
     '''the color associated with the route'''
     dropoffs: StopContinuity = d.field(
         m.fields.Enum(
-            StopContinuity, by_value=True, missing=StopContinuity.SCHEDULED
+            StopContinuity, by_value=True, missing=StopContinuity.NONE
         )
     )
     '''the continuity of dropoffs along the route'''
     pickups: StopContinuity = d.field(
         m.fields.Enum(
-            StopContinuity, by_value=True, missing=StopContinuity.SCHEDULED
+            StopContinuity, by_value=True, missing=StopContinuity.NONE
         )
     )
     '''the continuity of pickups along the route'''

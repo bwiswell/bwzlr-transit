@@ -29,7 +29,7 @@ class Feed:
             the url of the dataset publishing organization's website
         start_date (Optional[date]):
             the start date of the information provided in the GTFS dataset
-        version (str):
+        version (Optional[str]):
             the current version of the GTFS dataset
     '''
 

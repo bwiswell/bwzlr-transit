@@ -5,14 +5,7 @@ from typing import Optional
 import desert as d
 import marshmallow as m
 
-
-class Accessibility(Enum):
-    '''
-    An `Enum` describing the accessibility of a transit location.
-    '''
-    UNKNOWN = 0
-    ACCESSIBLE = 1
-    INACCESSIBLE = 2
+from .accessibility import Accessibility
 
 
 class LocationType(Enum):
@@ -53,7 +46,7 @@ class Stop:
             the latitude of the transit location
         lon (Optional[float]):
             the longitude of the transit location
-        name (str = 'unnamed'):
+        name (str):
             the name of the transit location
         platform_code (Optional[str]):
             the unique ID of the platform to stop at
@@ -96,6 +89,10 @@ class Stop:
         )
     )
     '''the `Accessibility` of the transit location for wheelchair boardings'''
+    name: str = d.field(
+        m.fields.String(data_key='stop_name', missing='unnamed')
+    )
+    '''the name of the transit location'''
     type: LocationType = d.field(
         m.fields.Enum(
             LocationType, 
@@ -123,10 +120,6 @@ class Stop:
         m.fields.Float(data_key='stop_lon', missing=None)
     )
     '''the longitude of the transit location'''
-    name: str = d.field(
-        m.fields.String(data_key='stop_name', missing='unnamed')
-    )
-    '''the name of the transit location'''
     platform_code: Optional[str] = d.field(
         m.fields.String(data_key='platform_code', missing=None)
     )
