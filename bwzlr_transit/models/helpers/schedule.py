@@ -64,8 +64,20 @@ class Schedule:
         return Schedule(additions, exceptions, calendars)
 
 
-    ### MAGIC METHODS ###
-    def __getitem__ (self, date: pydate) -> bool:
+    ### PROPERTIES ###
+    @property
+    def end (self) -> pydate:
+        '''the end date of the transit schedule'''
+        return max([c.end for c in self.calendars])
+    
+    @property
+    def start (self) -> pydate:
+        '''the start date of the transit schedule'''
+        return min([c.start for c in self.calendars])
+
+
+    ### METHODS ###
+    def active (self, date: pydate) -> bool:
         '''
         Returns a `bool` indicating if the service is active on `date`.
 
@@ -86,15 +98,3 @@ class Schedule:
             if cal.start <= date and date <= cal.end:
                 return cal.schedule[date.weekday()]
         return False
-
-
-    ### PROPERTIES ###
-    @property
-    def end (self) -> pydate:
-        '''the end date of the transit schedule'''
-        return max([c.end for c in self.calendars])
-    
-    @property
-    def start (self) -> pydate:
-        '''the start date of the transit schedule'''
-        return min([c.start for c in self.calendars])
