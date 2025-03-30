@@ -15,7 +15,7 @@ class Agency:
         id (str): the unique ID of the transit agency
         email (Optional[str]): the customer service email of the transit agency
         fare_url (Optional[str]): the URL of a fare or ticket website for the \
-        transit agency
+            transit agency
         lang (str): the primary language used by the transit agency
         name (str): the name of the transit agency
         phone (str): the voice telephone number for the transit agency
