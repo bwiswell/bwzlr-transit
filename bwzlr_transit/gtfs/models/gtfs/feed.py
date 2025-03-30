@@ -33,6 +33,7 @@ class Feed:
             the current version of the GTFS dataset
     '''
 
+    ### ATTRIBUTES ###
     # Required fields
     lang: str = d.field(m.fields.String(data_key='feed_lang'))
     '''the default language used for the text in this dataset'''

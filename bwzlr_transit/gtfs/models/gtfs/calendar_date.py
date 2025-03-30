@@ -18,14 +18,15 @@ class CalendarDate:
     Defines an exception to the service patterns defined in `calendar.txt`.
 
     Attributes:
+        service_id (str):
+            the ID of the service the calendar date modifies
         date (date):
             the date when the service exception occurs
         exception (ExceptionType):
             the type of service exception specified
-        service_id (str):
-            the ID of the service the calendar date modifies
     '''
 
+    ### ATTRIBUTES ###
     # Foreign IDs
     service_id: str = d.field(m.fields.String(data_key='service_id'))
     '''the ID of the service the calendar date modifies'''

@@ -30,6 +30,7 @@ class Agency:
             the URL of the transit agency
     '''
     
+    ### ATTRIBUTES ###
     # Model ID
     id: str = d.field(m.fields.String(data_key='agency_id'))
     '''the unique ID of the transit agency'''

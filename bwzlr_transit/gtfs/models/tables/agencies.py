@@ -4,9 +4,8 @@ from dataclasses import dataclass
 import os
 from typing import Optional
 
-from ..models import Agency, AGENCY_SCHEMA
-
-from .util import load_table
+from ..gtfs import Agency, AGENCY_SCHEMA
+from ..util import load_table
 
 
 @dataclass
@@ -25,23 +24,6 @@ class Agencies:
 
     ### ATTRIBUTES ###
     _agencies: dict[str, Agency]
-
-
-    ### MAGIC METHODS ###
-    def __getitem__ (self, id: str) -> Optional[Agency]:
-        '''
-        Returns the `Agency` record associated with `id`.
-
-        Parameters:
-            id (str):
-                the agency ID to match against `Agency.id`
-
-        Returns:
-            agency (Optional[Agency]):
-                the `Agency` record associated with `id`, or `None` if no \
-                matching record exists
-        '''
-        return self.data.get(id, None)
 
 
     ### CLASS METHODS ###
@@ -66,6 +48,23 @@ class Agencies:
                 key_fn = lambda a: a.id
             )
         )
+
+
+    ### MAGIC METHODS ###
+    def __getitem__ (self, id: str) -> Optional[Agency]:
+        '''
+        Returns the `Agency` record associated with `id`.
+
+        Parameters:
+            id (str):
+                the agency ID to match against `Agency.id`
+
+        Returns:
+            agency (Optional[Agency]):
+                the `Agency` record associated with `id`, or `None` if no \
+                matching record exists
+        '''
+        return self.data.get(id, None)
 
 
     ### PROPERTIES ###
