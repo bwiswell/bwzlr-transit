@@ -10,7 +10,7 @@ from .models import Feed
 from .tables import Agencies, Routes, Schedules, Trips
 
 
-def save_minified_gtfs (gtfs: GTFS, path: str):
+def save_mgtfs (gtfs: GTFS, path: str):
     print('saving minified GTFS data...')
     data = GTFS_SCHEMA.dump(gtfs)
     with open(path, 'w') as file:
@@ -19,7 +19,7 @@ def save_minified_gtfs (gtfs: GTFS, path: str):
 def load_gtfs (
             name: str, 
             path: str,
-            minified_path: Optional[str] = None
+            mpath: Optional[str] = None
         ) -> GTFS:
     print('loading GTFS data...')
     g = GTFS(
@@ -30,10 +30,10 @@ def load_gtfs (
         schedules=Schedules.from_gtfs(path), 
         trips=Trips.from_gtfs(path)
     )
-    if minified_path: save_minified_gtfs(g, minified_path)
+    if mpath: save_mgtfs(g, mpath)
     return g
 
-def load_minified_gtfs (path: str) -> GTFS:
+def load_mgtfs (path: str) -> GTFS:
     print('loading minified GTFS data...')
     data = {}
     with open(path, 'r') as file:
@@ -44,7 +44,7 @@ def fetch_gtfs (
             name: str,
             uri: str,
             sub: Optional[str] = None,
-            minified_path: Optional[str] = None
+            mpath: Optional[str] = None
         ) -> GTFS:
     print(f'fetching GTFS data from {uri}...')
     tmp_dir = os.path.join(
@@ -69,6 +69,22 @@ def fetch_gtfs (
             zip.extractall(tmp_dir)
         os.remove(zip_path)
 
-    g = load_gtfs(name, tmp_dir, minified_path)
+    g = load_gtfs(name, tmp_dir, mpath)
     shutil.rmtree(tmp_dir)
     return g
+
+def load (
+            name: str,
+            gtfs_path: Optional[str] = None,
+            gtfs_sub: Optional[str] = None,
+            gtfs_uri: Optional[str] = None,
+            mgtfs_path: Optional[str] = None
+        ) -> GTFS:
+    if mgtfs_path and os.path.exists(mgtfs_path):
+        return load_mgtfs(mgtfs_path)
+    elif gtfs_path:
+        return load_gtfs(name, gtfs_path, mgtfs_path)
+    else:
+        return fetch_gtfs(
+            name, gtfs_uri, gtfs_sub, mgtfs_path
+        )
