@@ -10,6 +10,7 @@ from .tables import (
     Agencies, AGENCIES_SCHEMA,
     Routes, ROUTES_SCHEMA,
     Schedules, SCHEDULES_SCHEMA,
+    Stops, STOPS_SCHEMA,
     Trips, TRIPS_SCHEMA
 )
 
@@ -30,6 +31,8 @@ class GTFS:
             a `Routes` table mapping `str` IDs to `Route` records
         schedules (Schedules):
             a `Schedules` table mapping `str` service IDs to `Schedule` records
+        stops (Stops):
+            a `Stops` table mapping `str` IDs to `Stop` records
         trips (Trips):
             a `Trips` table mapping `str` IDs to `Trip` records
     '''
@@ -48,6 +51,8 @@ class GTFS:
     '''a `Routes` table mapping `str` IDs to `Route` records'''
     schedules: Schedules = d.field(m.fields.Nested(SCHEDULES_SCHEMA))
     '''a `Schedules` table mapping `str` service IDs to `Schedule` records'''
+    stops: Stops = d.field(m.fields.Nested(STOPS_SCHEMA))
+    '''a `Stops` table mapping `str` IDs to `Stop` records'''
     trips: Trips = d.field(m.fields.Nested(TRIPS_SCHEMA))
     '''a `Trips` table mapping `str` IDs to `Trip` records'''
 
