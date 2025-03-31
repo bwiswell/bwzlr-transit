@@ -14,7 +14,7 @@ import bwzlr_transit as bt
 gtfs = bt.fetch_gtfs(
     name = 'your-dataset-name',                     # Name of the GTFS dataset
     uri = 'https://www.example.com/gtfs/data.zip',  # URI of the GTFS dataset
-    sub = 'google_rail',                            # Optional, for nested GTFS dataset
+    sub = 'subdirectory',                           # Optional, for nested GTFS datasets
     minified_path = 'path/to/minified/data.json'    # Optional, path to save minified data
 )
 ```
@@ -39,13 +39,13 @@ gtfs = bt.load_minified_gtfs(
 )
 ```
 
-### Loading local minified GTFS data
+### Saving local minified GTFS data
 ```python
 import bwzlr_transit as bt
 
-bt.load_minified_gtfs(
+bt.save_minified_gtfs(
     gtfs = your_gtfs_data,                          # The GTFS object to write to file
-    path = 'path/to/minified/gtfs/data'             # The path to save the minified GTFS dataset at
+    path = 'path/to/minified/gtfs/data'             # The path to save the minified data
 )
 ```
 
