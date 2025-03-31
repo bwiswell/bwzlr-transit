@@ -11,13 +11,14 @@
     - [Fetching remote GTFS data](#fetching-remote-gtfs-data)
     - [Loading local GTFS data](#loading-local-gtfs-data)
     - [Loading local mGTFS data](#loading-local-minified-gtfs-data)
+    - [Loading local mGTFS data with fallbacks](#loading-local-minified-gtfs-data-with-fallbacks)
     - [Saving mGTFS data](#saving-minified-gtfs-data)
 - [Example](#example)
 
 ## Overview
 
 ### MGTFS
-`bwzlr-transit` chooses to prioritize the core journey planning functionality of GTFS data, ignoring and discarding GTFS data irrelevant to route, trip, and schedule information to improve I/O and query speed.
+`bwzlr-transit` prioritizes I/O and query speed for journey planning via GTFS data, ignoring and discarding GTFS data other than agencies, routes, schedules, stops, and trips.
 
 Typical GTFS data consists of a `.zip` of many `.csv` files, each containing a database table:
 
@@ -29,17 +30,25 @@ gtfs.zip
     ...
 ```
 
-mGTFS is a minimal representation of the parts of these tables relevant to queries about route, trip, and schedule information, stored in a single `.json` file:
+mGTFS is a minimal representation of the parts of these tables relevant to queries about agency, route, schedule, stop, and trip stored in a single `.json` file with the following structure:
 
-```json
+```ts
+type MGTFS = {
+    name: string
+    feed: {
+        contact_email?: string
+    }
+}
+```
+```python
 {
     "name": "dataset-name",
     "feed": {
-        ...
+        "contact_email": null,
     },
     "agencies": {
         "agency-a": {
-
+            ...
         },
         ...
     },
@@ -51,6 +60,12 @@ mGTFS is a minimal representation of the parts of these tables relevant to queri
     },
     "schedules": {
         "service-a": {
+            ...
+        },
+        ...
+    },
+    "stops": {
+        "stop-a": {
             ...
         },
         ...
@@ -78,10 +93,10 @@ poetry add git+https://www.github.com/bwiswell/bwzlr-transit.git
 import bwzlr_transit as bt
 
 gtfs = bt.fetch_gtfs(
-    name = 'your-dataset-name',                     # Name of the GTFS dataset
-    uri = 'https://www.example.com/gtfs/data.zip',  # URI of the GTFS dataset
-    sub = 'subdirectory',                           # Optional, for nested GTFS datasets
-    minified_path = 'path/to/minified/data.json'    # Optional, path to save minified data
+    name = 'your-dataset-name',                         # Name of the GTFS dataset
+    gtfs_uri = 'https://www.example.com/gtfs/data.zip', # URI of the GTFS dataset
+    gtfs_sub = 'subdirectory',                          # Optional, for nested GTFS datasets
+    mgtfs_path = 'path/to/minified/data.json'           # Optional, path to save minified data
 )
 ```
 
@@ -90,9 +105,9 @@ gtfs = bt.fetch_gtfs(
 import bwzlr_transit as bt
 
 gtfs = bt.load_gtfs(
-    name = 'your-dataset-name',                     # Name of the GTFS dataset
-    path = 'path/to/gtfs/data',                     # Local path to the GTFS dataset
-    minified_path = 'path/to/minified/data.json'    # Optional, path to save minified data
+    name = 'your-dataset-name',                         # Name of the GTFS dataset
+    gtfs_path = 'path/to/gtfs/data',                    # Local path to the GTFS dataset
+    mgtfs_path = 'path/to/minified/data.json'           # Optional, path to save minified data
 )
 ```
 
@@ -100,8 +115,21 @@ gtfs = bt.load_gtfs(
 ```python
 import bwzlr_transit as bt
 
-gtfs = bt.load_minified_gtfs(
-    path = 'path/to/minified/gtfs/data'             # Local path to the minified GTFS dataset
+gtfs = bt.load_mgtfs(
+    mgtfs_path = 'path/to/minified/gtfs/data'           # Local path to the minified GTFS dataset
+)
+```
+
+### Loading local minified GTFS data with fallbacks
+```python
+import bwzlr_transit as bt
+
+gtfs = bt.load(
+    name = 'your-dataset-name',                         # Name of the GTFS dataset
+    gtfs_path = 'path/to/gtfs/data',                    # Optional, local path to the GTFS dataset
+    gtfs_sub = 'subdirectory',                          # Optional, for nested GTFS datasets
+    gtfs_uri = 'https://www.example.com/gtfs/data.zip', # Optional, URI of the GTFS dataset
+    mgtfs_path = 'path/to/minified/gtfs/data'           # Optional, path to save minified data
 )
 ```
 
@@ -109,9 +137,9 @@ gtfs = bt.load_minified_gtfs(
 ```python
 import bwzlr_transit as bt
 
-bt.save_minified_gtfs(
-    gtfs = your_gtfs_data,                          # The GTFS object to write to file
-    path = 'path/to/minified/gtfs/data'             # The path to save the minified data
+bt.save_mgtfs(
+    gtfs = your_gtfs_data,                              # The GTFS object to write to file
+    mgtfs_path = 'path/to/minified/gtfs/data'           # The path to save the minified data
 )
 ```
 
@@ -125,6 +153,6 @@ gtfs = bt.fetch_gtfs(
     name = 'septa', 
     uri = GTFS_URI, 
     sub = 'google_rail',
-    minified_path = 'your/minified/gtfs/path.json'
+    mpath = 'your/minified/gtfs/path.json'
 )
 ```
