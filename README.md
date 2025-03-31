@@ -1,5 +1,71 @@
 # bwzlr-transit
 
+`bwzlr-transit` is a lightweight Python package designed for fetching, parsing, and stripping down General Transit Feed Specification (GTFS) data to provide speedy Pythonic handling and querying about route, trip, and schedule information in a local context. No more messy and cross-referential GTFS datasets full of `.csv` files or SQL-based ORM libraries - just use `bt.fetch_gtfs` to fetch, parse, and transform your favorite transit agency's GTFS feed into a clean and monolithic `.json`-based mGTFS (Minified General Transit Feed Specification) dataset in seconds.
+
+## Contents
+
+- [Overview](#overview)
+    - [mGTFS](#mgtfs)
+- [Setup](#setup)
+- [Usage](#usage)
+    - [Fetching remote GTFS data](#fetching-remote-gtfs-data)
+    - [Loading local GTFS data](#loading-local-gtfs-data)
+    - [Loading local mGTFS data](#loading-local-minified-gtfs-data)
+    - [Saving mGTFS data](#saving-minified-gtfs-data)
+- [Example](#example)
+
+## Overview
+
+### MGTFS
+`bwzlr-transit` chooses to prioritize the core journey planning functionality of GTFS data, ignoring and discarding GTFS data irrelevant to route, trip, and schedule information to improve I/O and query speed.
+
+Typical GTFS data consists of a `.zip` of many `.csv` files, each containing a database table:
+
+```txt
+gtfs.zip
+    agency.csv
+    calendar.csv
+    calendar_dates.csv
+    ...
+```
+
+mGTFS is a minimal representation of the parts of these tables relevant to queries about route, trip, and schedule information, stored in a single `.json` file:
+
+```json
+{
+    "name": "dataset-name",
+    "feed": {
+        ...
+    },
+    "agencies": {
+        "agency-a": {
+
+        },
+        ...
+    },
+    "routes": {
+        "route-a": {
+            ...
+        },
+        ...
+    },
+    "schedules": {
+        "service-a": {
+            ...
+        },
+        ...
+    },
+    "trips": {
+        "trip-a": {
+            ...
+        },
+        ...
+    }
+    ...
+}
+```
+
+
 ## Setup
 ```sh
 poetry add git+https://www.github.com/bwiswell/bwzlr-transit.git
@@ -39,7 +105,7 @@ gtfs = bt.load_minified_gtfs(
 )
 ```
 
-### Saving local minified GTFS data
+### Saving minified GTFS data
 ```python
 import bwzlr_transit as bt
 
