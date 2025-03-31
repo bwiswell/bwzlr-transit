@@ -3,8 +3,14 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date as pydate
 
-from .calendar import Calendar
-from .calendar_date import CalendarDate, ExceptionType
+import desert as d
+import marshmallow as m
+
+from ..util import split
+
+from .calendar import Calendar, CALENDAR_SCHEMA
+from .calendar_date import CalendarDate, ExceptionType as ExType
+from .date_range import DateRange, DATE_RANGE_SCHEMA
 
 
 @dataclass
@@ -13,32 +19,40 @@ class Schedule:
     A dataclass model that defines a schedule for a transit service.
 
     Attributes:
+        service_id (str):
+            the unique ID of the service associated with the schedule
         additions (list[date]): 
             a list of dates on which additional service is offered
-        calendars (list[Calendar]):
-            a list of `Calendar` records associated with the transit service
         end (date):
             the end date of the transit schedule
         exceptions (list[date]): 
             a list of dates on which service is suspended
+        ranges (list[DateRange]):
+            a `list` `DateRange` records associated with the schedule
         start (date):
             the start date of the transit schedule
     '''
 
     ### ATTRIBUTES ###
-    # Required fields
-    additions: list[pydate]
+    # Foreign IDs
+    service_id: str = d.field(m.fields.String(data_key='service_id'))
+    '''the unique ID of the service associated with the schedule'''
+
+    additions: list[pydate] = d.field(m.fields.List(m.fields.Date()))
     '''a list of dates on which additional service is offered'''
-    calendars: list[Calendar]
-    '''a list of `Calendar` records associated with the service'''
-    exceptions: list[pydate]
+    exceptions: list[pydate] = d.field(m.fields.List(m.fields.Date()))
     '''a list of dates on which service is suspended'''
+    ranges: list[DateRange] = d.field(
+        m.fields.List(m.fields.Nested(DATE_RANGE_SCHEMA))
+    )
+    '''a `list` `DateRange` records associated with the schedule'''
 
 
     ### CLASS METHODS ###
     @classmethod
     def from_gtfs (
                 cls,
+                service_id: str,
                 calendars: list[Calendar],
                 dates: list[CalendarDate]
             ) -> Schedule:
@@ -50,6 +64,8 @@ class Schedule:
         transit service.
 
         Parameters:
+            service_id (str):
+                the unique ID of the service associated with the schedule
             calendars (list[Calendar]):
                 a list of `Calendar` records associated with a transit service
             dates (list[CalendarDate]):
@@ -60,21 +76,28 @@ class Schedule:
             schedule (Schedule):
                 a dataclass model that defines a schedule for a transit service
         '''
-        additions = [d for d in dates if d.exception == ExceptionType.ADD]
-        exceptions = [d for d in dates if d.exception == ExceptionType.REMOVE]
-        return Schedule(additions, exceptions, calendars)
+        adds, excepts = split(dates, lambda d: d.exception == ExType.ADD)
+        return Schedule(
+            service_id=service_id, 
+            additions=[a.date for a in adds], 
+            exceptions=[e.date for e in excepts], 
+            ranges=[
+                DateRange(cal.end, cal.schedule, cal.start)
+                for cal in calendars
+            ]
+        )
 
 
     ### PROPERTIES ###
     @property
     def end (self) -> pydate:
         '''the end date of the transit schedule'''
-        return max([c.end for c in self.calendars])
+        return max([r.end for r in self.ranges])
     
     @property
     def start (self) -> pydate:
         '''the start date of the transit schedule'''
-        return min([c.start for c in self.calendars])
+        return min([r.start for r in self.ranges])
 
 
     ### METHODS ###
@@ -95,7 +118,10 @@ class Schedule:
         '''
         if date in self.additions: return True
         if date in self.exceptions: return False
-        for cal in self.calendars:
-            if cal.start <= date and date <= cal.end:
-                return cal.schedule[date.weekday()]
+        for r in self.ranges:
+            if r.start <= date and date <= r.end:
+                return r.schedule[date.weekday()]
         return False
+    
+
+SCHEDULE_SCHEMA = d.schema(Schedule)

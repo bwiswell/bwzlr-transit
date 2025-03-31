@@ -6,6 +6,7 @@ import desert as d
 import marshmallow as m
 
 from .accessibility import Accessibility
+from .timetable import Timetable, TIMETABLE_SCHEMA
 
 
 class BikesAllowed(Enum):
@@ -44,6 +45,8 @@ class Trip:
             the headsign to display for the trip
         short_name (Optional[str]):
             a short name for the trip
+        timetable (Timetable):
+            the `Timetable` associated with the trip
     '''
 
     ### ATTRIBUTES ###
@@ -84,6 +87,10 @@ class Trip:
         )
     )
     '''the `BikesAllowed` of the trip'''
+    timetable: Timetable = d.field(
+        m.fields.Nested(TIMETABLE_SCHEMA, missing=None)
+    )
+    '''the `Timetable` associated with the trip'''
 
     # Optional fields
     direction: Optional[bool] = d.field(

@@ -1,9 +1,14 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from datetime import date
+import os
 from typing import Optional
 
 import desert as d
 import marshmallow as m
+
+from ..util import load_list
 
 
 @dataclass
@@ -75,6 +80,26 @@ class Feed:
         m.fields.String(data_key='feed_version', missing=None)
     )
     '''the current version of the GTFS dataset'''
+
+
+    ### CLASS METHODS ###
+    @classmethod
+    def from_gtfs (self, path: str) -> Feed:
+        '''
+        Returns a `Feed` record populated from the GTFS data at `path`.
+
+        Parameters:
+            path (str):
+                the path to the GTFS dataset
+
+        Returns:
+            feed (Feed):
+                a `Feed` record populated from the GTFS data at `path`
+        '''
+        return load_list(
+            os.path.join(path, 'feed_info.txt'), 
+            FEED_SCHEMA
+        )[0]
 
 
 FEED_SCHEMA = d.schema(Feed)

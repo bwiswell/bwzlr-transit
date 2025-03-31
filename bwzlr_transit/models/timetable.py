@@ -3,74 +3,62 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional
 
-from .stop_time import StopTime
+import desert as d
+import marshmallow as m
+
+from .stop_time import StopTime, STOP_TIME_SCHEMA
 
 
 @dataclass
 class Timetable:
     '''
-    A dataclass model that defines a timetable for a trip.
+    Serializable dataclass table mapping `str` stop IDs to `StopTime` records.
 
     Attributes:
-        data (dict[str, StopTime])
-            a dict mapping `str` IDs to `StopTime` records
+        data (dict[str, StopTime]):
+            a `dict` mapping `str` stop IDs to `StopTime` records
         end (StopTime)
             the last `StopTime` record in the table chronologically
         start (StopTime)
             the first `StopTime` record in the table chronologically
-        stops (list[StopTime])
-            an ordered list of all `StopTime` records in the table
-        stop_ids (list[str])
-            a list of all `stop_ids` in the table
+        stop_ids (list[str]):
+            a `list` of all `str` stop IDs in the `Timetable` table
+        stops (list[StopTime]):
+            a `list` of all `StopTime` records in the `Timetable` table
     '''
 
     ### ATTRIBUTES ###
-    # Required fields
-    _stops: dict[str, StopTime]
+    data: dict[str, StopTime] = d.field(
+        m.fields.Function(
+            deserialize=lambda data: { 
+                id: STOP_TIME_SCHEMA.load(d) for id, d in data.items() 
+            },
+            serialize=lambda data: { 
+                d.stop_id: STOP_TIME_SCHEMA.dump(d) for d in data.data.values() 
+            }
+        )
+    )
+    '''a `dict` mapping `str` stop IDs to `StopTime` records'''
 
 
     ### CLASS METHODS ###
     @classmethod
     def from_gtfs (cls, stops: list[StopTime]) -> Timetable:
         '''
-        Returns a `Timetable` created from the given `StopTime` records.
-
-        All `StopTime` values should be for the same trip.
+        Returns an `Timetable` populated from `stops`.
 
         Parameters:
-            stops (list[StopTime])
-                a list of `StopTime` records associated with a trip
+            stops (list[StopTime]):
+                a `list` of `StopTime` records to put in the `Timetable`
 
         Returns:
             timetable (Timetable):
-                a dataclass model that defines a timetable for a trip
+                an `Timetable` populated from `stops`
         '''
         return Timetable({ s.stop_id: s for s in stops })
 
 
-    ### MAGIC METHODS ###
-    def __getitem__ (self, stop_id: str) -> Optional[StopTime]:
-        '''
-        Returns the `StopTime` record associated with `stop_id`.
-
-        Parameters:
-            stop_id (str):
-                the service ID to match against `StopTime.stop_id`
-
-        Returns:
-            stop (Optional[StopTime]):
-                the `StopTime` record associated with `stop_id`, or `None` if \
-                no matching record exists
-        '''
-        return self.data.get(stop_id, None)
-
-
-    ### PROPERTIES ###   
-    @property
-    def data (self) -> dict[str, StopTime]:
-        '''a dict mapping `str` IDs to `StopTime` records'''
-        return self._stops
-    
+    ### PROPERTIES ###    
     @property
     def end (self) -> StopTime:
         '''the last `StopTime` record in the table chronologically'''
@@ -80,16 +68,37 @@ class Timetable:
     def start (self) -> StopTime:
         '''the first `StopTime` record in the table chronologically'''
         return self.stops[0]
+    
+    @property
+    def stop_ids (self) -> list[str]:
+        '''a `list` of all `str` stop IDs in the `Timetable` table'''
+        return list(self.data.keys())
      
     @property
     def stops (self) -> list[StopTime]:
         '''an ordered list of all `Stop` records in the table'''
         return sorted(
-            list(self._stops.values()), 
+            list(self.data.values()), 
             key=lambda st: st.index
         )
+    
 
-    @property
-    def stop_ids (self) -> list[str]: 
-        '''a list of all `stop_ids` in the table'''
-        return list(self._stops.keys())
+    ### MAGIC METHODS ###
+    def __getitem__ (self, id: str) -> Optional[StopTime]:
+        '''
+        Returns the `StopTime` record associated with the `id` if it exists,
+        otherwise returns `None`.
+        
+        Parameters:
+            id (str):
+                the `str` id associated with the `StopTime` record to retrieve
+
+        Returns:
+            record (Optional[StopTime]):
+                the `StopTime` record associated with `id` if it exists, 
+                otherwise `None`
+        '''
+        return self.data.get(id, None)
+    
+
+TIMETABLE_SCHEMA = d.schema(Timetable)
