@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import date as pydate, time
+from datetime import date as pydate
 import os
-from typing import Callable
+from typing import Callable, Optional
 
 from marshmallow import Schema
+import pandas as pd
 
 from .models import gtfs as g, helpers as h
 
@@ -66,7 +67,9 @@ class GTFS:
         print('loading routes...')
         routes = {
             r.id: r for r in GTFS.load_list(
-                os.path.join(path, 'routes.txt'), g.ROUTE_SCHEMA
+                os.path.join(path, 'routes.txt'), 
+                g.ROUTE_SCHEMA,
+                int_cols=['route_type']
             )
         }
         print('loading schedules...')
@@ -74,7 +77,9 @@ class GTFS:
             os.path.join(path, 'calendar.txt'), g.CALENDAR_SCHEMA
         )
         dates: list[g.CalendarDate] = GTFS.load_list(
-            os.path.join(path, 'calendar_dates.txt'), g.CALENDAR_DATE_SCHEMA
+            os.path.join(path, 'calendar_dates.txt'), 
+            g.CALENDAR_DATE_SCHEMA,
+            int_cols=['exception_type']
         )
         service_ids = set(
             [c.service_id for c in calendars] + [d.service_id for d in dates]
@@ -95,13 +100,24 @@ class GTFS:
             ) for sid in service_ids
         }
         print('loading stop times...')
-        stop_times: list[g.StopTime] = GTFS.load_list(
-            os.path.join(path, 'stop_times.txt'), g.STOP_TIME_SCHEMA
-        )
+        stop_times: dict[str, list[g.StopTime]] = {}
+        for stop in GTFS.load_list(
+                    os.path.join(path, 'stop_times.txt'), 
+                    g.STOP_TIME_SCHEMA,
+                    int_cols=['drop_off_type', 'pickup_type', 'timepoint']
+                ):
+            if stop.trip_id in stop_times:
+                stop_times[stop.trip_id].append(stop)
+            else:
+                stop_times[stop.trip_id] = []
+
         print('loading trips...')
         trips: list[g.Trip] = [
-            h.Trip.from_gtfs(trip, stop_times) for trip in GTFS.load_list(
-                os.path.join(path, 'trips.txt'), g.TRIP_SCHEMA
+            h.Trip.from_gtfs(trip, stop_times[trip.id]) 
+            for trip in GTFS.load_list(
+                os.path.join(path, 'trips.txt'), 
+                g.TRIP_SCHEMA,
+                int_cols=['bikes_allowed', 'wheelchair_accessible']
             )
         ]
 
@@ -117,7 +133,13 @@ class GTFS:
 
 
     @classmethod
-    def load_list (cls, path: str, schema: Schema) -> list:
+    def load_list (
+                cls, 
+                path: str, 
+                schema: Schema,
+                int_cols: Optional[list[str]] = [],
+                float_cols: Optional[list[str]] = []
+            ) -> list:
         '''
         Reads a CSV file and returns a list of deserialized records.
 
@@ -131,26 +153,37 @@ class GTFS:
             records (list[T]):
                 a list of deserialized records
         '''
-        print('\treading data from CSV...')
-        data: list[str]
-        with open(path, 'r') as file:
-            data = file.readlines()
+        print(f'\tReading from {path}')
+        print(f'\t\tLoading data from CSV...')
+        df = pd.read_csv(path, dtype=str)
 
-        header = data[0].rstrip().split(',')
-        print('\tparsing data...')
-        records = []
-        for line in data[1:]:
-            if len(line) == 0: continue
-            records.append(
-                schema.load({
-                    h: v if len(v) > 0 else None
-                    for h, v in zip(
-                        header,
-                        line.rstrip().split(',')
-                    )
-                })
+        print('\t\tCleaning data...')
+        for col in float_cols:
+            df[col] = pd.to_numeric(
+                df[col], errors='coerce', downcast='float'
             )
-        return records
+        for col in int_cols:
+            df[col] = pd.to_numeric(
+                df[col], errors='coerce', downcast='integer'
+            )
+
+        df = df.fillna('').replace([''], [None])
+
+        print('\t\tConverting data to records...')
+        json = df.to_dict(orient='records')
+
+        print('\t\tDeserializing...')
+        return schema.load(
+            [
+                {
+                    k: v 
+                    for k, v in j.items() 
+                    if v != None
+                }
+                for j in json
+            ],
+            many=True
+        )
     
 
     ### METHODS ###        
