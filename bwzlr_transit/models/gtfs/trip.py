@@ -67,20 +67,20 @@ class Trip:
 
     # Required fields
     accessibility: Accessibility = d.field(
-        m.fields.Function(
-            deserialize=lambda a: Accessibility(int(a)),
+        m.fields.Enum(
+            Accessibility,
+            by_value=True,
             data_key='wheelchair_accessible',
             missing=Accessibility.UNKNOWN
         )
     )
     '''the `Accessibility` of the trip'''
     bikes: BikesAllowed = d.field(
-        m.fields.Function(
-            deserialize=lambda ba: BikesAllowed(int(ba)),
+        m.fields.Enum(
+            BikesAllowed,
+            by_value=True,
             data_key='bikes_allowed',
-            load_default=BikesAllowed.UNKNOWN,
-            missing=None,
-            required=False
+            missing=BikesAllowed.UNKNOWN
         )
     )
     '''the `BikesAllowed` of the trip'''
