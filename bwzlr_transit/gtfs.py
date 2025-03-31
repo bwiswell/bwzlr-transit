@@ -20,12 +20,12 @@ class GTFS:
     Base dataclass database for reading and managing GTFS datasets.
     
     Attributes:
-        agencies (Agencies):
-            an `Agencies` table mapping `str` IDs to `Agency` records
-        feed (Feed):
-            the `Feed` of the GTFS dataset
         name (str):
             the name of the GTFS dataset
+        feed (Feed):
+            the `Feed` of the GTFS dataset
+        agencies (Agencies):
+            an `Agencies` table mapping `str` IDs to `Agency` records
         routes (Routes):
             a `Routes` table mapping `str` IDs to `Route` records
         schedules (Schedules):
