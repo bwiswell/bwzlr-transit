@@ -3,7 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date as pydate
 
-from ..gtfs import Calendar, CalendarDate, ExceptionType
+from .calendar import Calendar
+from .calendar_date import CalendarDate, ExceptionType
 
 
 @dataclass
