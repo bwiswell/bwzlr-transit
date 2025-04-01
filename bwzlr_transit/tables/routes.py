@@ -21,6 +21,8 @@ class Routes:
             a `dict` mapping `str` IDs to `Route` records
         ids (list[str]):
             a `list` of all `str` IDs in the `Routes` table
+        names (list[str]):
+            a `list` of all `Route.name` values in the `Routes` table
         routes (list[Route]):
             a `list` of all `Route` records in the `Routes` table
     '''
@@ -68,6 +70,11 @@ class Routes:
     def ids (self) -> list[str]:
         '''a `list` of all `str` IDs in the `Routes` table'''
         return list(self.data.keys())
+    
+    @property
+    def names (self) -> list[str]:
+        '''a `list` of all `Route.name` values in the `Routes` table'''
+        return [r.name for r in self.routes]
     
     @property
     def routes (self) -> list[Route]:

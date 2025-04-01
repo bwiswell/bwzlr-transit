@@ -101,4 +101,10 @@ class Timetable:
         return self.data.get(id, None)
     
 
+    ### METHODS ###
+    def connects (self, stop_a_id: str, stop_b_id: str) -> bool:
+        return stop_a_id in self.data and stop_b_id in self.data and \
+            self[stop_a_id].index < self[stop_b_id].index
+    
+
 TIMETABLE_SCHEMA = d.schema(Timetable)

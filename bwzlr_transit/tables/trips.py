@@ -87,14 +87,14 @@ class Trips:
 
     ### PROPERTIES ###
     @property
-    def trips (self) -> list[Trip]:
-        '''a `list` of all `Trip` records in the `Trips` table'''
-        return list(self.data.values())
-    
-    @property
     def ids (self) -> list[str]:
         '''a `list` of all `str` IDs in the `Trips` table'''
         return list(self.data.keys())
+    
+    @property
+    def trips (self) -> list[Trip]:
+        '''a `list` of all `Trip` records in the `Trips` table'''
+        return list(self.data.values())    
     
 
     ### MAGIC METHODS ###
@@ -113,6 +113,20 @@ class Trips:
                 `None`
         '''
         return self.data.get(id, None)
+    
+
+    ### METHODS ###
+    def connecting (self, stop_a_id: str, stop_b_id: str) -> Trips:
+        return Trips({
+            t.id: t for t in self.trips
+            if t.connects(stop_a_id, stop_b_id)
+        })
+    
+    def on_date (self, service_ids: list[str]) -> Trips:
+        return Trips({
+            t.id: t for t in self.trips
+            if t.service_id in service_ids
+        })
     
 
 TRIPS_SCHEMA = d.schema(Trips)

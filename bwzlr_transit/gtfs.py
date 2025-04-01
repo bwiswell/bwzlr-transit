@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import date as pydate
 import json
 import os
 import shutil
@@ -109,7 +110,8 @@ class GTFS:
             feed=Feed.from_gtfs(path),
             agencies=Agencies.from_gtfs(path), 
             routes=Routes.from_gtfs(path), 
-            schedules=Schedules.from_gtfs(path), 
+            schedules=Schedules.from_gtfs(path),
+            stops=Stops.from_gtfs(path),
             trips=Trips.from_gtfs(path)
         )
 
@@ -124,6 +126,31 @@ class GTFS:
         data = GTFS_SCHEMA.dump(gtfs)
         with open(mgtfs_path, 'w') as file:
             json.dump(data, file)
+
+
+    ### METHODS ###
+    def _ref (self, trips: Trips) -> GTFS:
+        return GTFS(
+            self.name,
+            self.feed,
+            self.agencies,
+            self.routes,
+            self.schedules,
+            self.stops,
+            trips
+        )
+    
+    def connecting (self, stop_a_id: str, stop_b_id: str) -> GTFS:
+        return self._ref(self.trips.connecting(stop_a_id, stop_b_id))
+    
+    def on_date (self, date: pydate) -> GTFS:
+        return self._ref(self.trips.on_date(self.schedules.on_date(date)))
+
+    def today (self) -> GTFS:
+        return self.on_date(pydate.today())
+
+    
+
 
 
 GTFS_SCHEMA = d.schema(GTFS)

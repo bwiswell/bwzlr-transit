@@ -23,6 +23,8 @@ class Stops:
             a `dict` mapping `str` IDs to `Stop` records
         ids (list[str]):
             a `list` of all `str` IDs in the `Stops` table
+        names (list[str]):
+            a `list` of all `Stop.name` values in the `Stops` table
         stops (list[Stop]):
             a `list` of all `Stop` records in the `Stops` table
     '''
@@ -58,7 +60,7 @@ class Stops:
                 an `Stops` table populated from the GTFS data at `path`
         '''
         stops: list[Stop] = load_list(
-            os.path.join(path, 'stop_times.txt'), 
+            os.path.join(path, 'stops.txt'), 
             STOP_SCHEMA,
             int_cols=['drop_off_type', 'pickup_type', 'timepoint']
         )
@@ -71,6 +73,11 @@ class Stops:
     def ids (self) -> list[str]:
         '''a `list` of all `str` IDs in the `Stops` table'''
         return list(self.data.keys())
+    
+    @property
+    def names (self) -> list[str]:
+        '''a `list` of all `Stop.name` values in the `Stops` table'''
+        return [s.name for s in self.stops]
     
     @property
     def stops (self) -> list[Stop]:

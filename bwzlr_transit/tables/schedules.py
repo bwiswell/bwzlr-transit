@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import date as pydate
 import os
 from typing import Optional
 
@@ -120,6 +121,14 @@ class Schedules:
                 exists, otherwise `None`
         '''
         return self.data.get(service_id, None)
+    
+
+    ### METHODS ###
+    def on_date (self, date: pydate) -> list[str]:
+        return [
+            sid for sid in self.service_ids
+            if self[sid].active(date)
+        ]
     
 
 SCHEDULES_SCHEMA = d.schema(Schedules)

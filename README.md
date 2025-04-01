@@ -54,3 +54,19 @@ gtfs = bt.GTFS.load(
     mgtfs_path = 'path/to/minified/gtfs/data'           # Optional, local path to the mGTFS dataset
 )
 ```
+
+## Example
+```python
+import bwzlr_transit
+
+JEFFERSON_STATION = '90006'
+WASHINGTON_LANE_STATION = '90714'
+URI = 'https://www3.septa.org/developer/gtfs_public.zip'
+
+g = bt.GTFS.load('SEPTA', gtfs_uri=URI, gtfs_sub='google_rail')
+
+g = g.today().connecting(JEFFERSON_STATION, WASHINGTON_LANE_STATION)
+
+for trip in g.trips.trips:
+    print(trip)
+```

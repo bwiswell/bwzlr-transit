@@ -107,5 +107,10 @@ class Trip:
     '''a short name for the trip'''
 
 
+    ### METHODS ###
+    def connects (self, stop_a_id: str, stop_b_id: str) -> bool:
+        return self.timetable.connects(stop_a_id, stop_b_id)
+
+
 
 TRIP_SCHEMA = d.schema(Trip)
