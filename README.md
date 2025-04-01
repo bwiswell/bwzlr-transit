@@ -25,46 +25,6 @@ gtfs.zip
 
 mGTFS is a minimal representation of the parts of these tables relevant to queries about agency, route, schedule, stop, and trip stored in a single `.json` file.
 
-```json
-{
-    "name": "dataset-name",
-    "feed": {
-        ...
-    },
-    "agencies": {
-        "agency-a": {
-            ...
-        },
-        ...
-    },
-    "routes": {
-        "route-a": {
-            ...
-        },
-        ...
-    },
-    "schedules": {
-        "service-a": {
-            ...
-        },
-        ...
-    },
-    "stops": {
-        "stop-a": {
-            ...
-        },
-        ...
-    },
-    "trips": {
-        "trip-a": {
-            ...
-        },
-        ...
-    }
-    ...
-}
-```
-
 
 ## Setup
 ```sh
