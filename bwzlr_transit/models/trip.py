@@ -6,6 +6,7 @@ import desert as d
 import marshmallow as m
 
 from .accessibility import Accessibility
+from .timetable import Timetable, TIMETABLE_SCHEMA
 
 
 class BikesAllowed(Enum):
@@ -44,6 +45,8 @@ class Trip:
             the headsign to display for the trip
         short_name (Optional[str]):
             a short name for the trip
+        timetable (Timetable):
+            the `Timetable` associated with the trip
     '''
 
     ### ATTRIBUTES ###
@@ -67,23 +70,27 @@ class Trip:
 
     # Required fields
     accessibility: Accessibility = d.field(
-        m.fields.Function(
-            deserialize=lambda a: Accessibility(int(a)),
+        m.fields.Enum(
+            Accessibility,
+            by_value=True,
             data_key='wheelchair_accessible',
             missing=Accessibility.UNKNOWN
         )
     )
     '''the `Accessibility` of the trip'''
     bikes: BikesAllowed = d.field(
-        m.fields.Function(
-            deserialize=lambda ba: BikesAllowed(int(ba)),
+        m.fields.Enum(
+            BikesAllowed,
+            by_value=True,
             data_key='bikes_allowed',
-            load_default=BikesAllowed.UNKNOWN,
-            missing=None,
-            required=False
+            missing=BikesAllowed.UNKNOWN
         )
     )
     '''the `BikesAllowed` of the trip'''
+    timetable: Timetable = d.field(
+        m.fields.Nested(TIMETABLE_SCHEMA, missing=None)
+    )
+    '''the `Timetable` associated with the trip'''
 
     # Optional fields
     direction: Optional[bool] = d.field(
@@ -98,6 +105,11 @@ class Trip:
         m.fields.String(data_key='trip_short_name', missing=None)
     )
     '''a short name for the trip'''
+
+
+    ### METHODS ###
+    def connects (self, stop_a_id: str, stop_b_id: str) -> bool:
+        return self.timetable.connects(stop_a_id, stop_b_id)
 
 
 

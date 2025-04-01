@@ -1,196 +1,231 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import date as pydate, time
+from datetime import date as pydate
+import json
 import os
-from typing import Callable
+import shutil
+from typing import Optional
+from urllib import request
+import zipfile
 
-from marshmallow import Schema
+import desert as d
+import marshmallow as m
 
-from .models import gtfs as g, helpers as h
+from .models import Feed, FEED_SCHEMA
+from .tables import (
+    Agencies, AGENCIES_SCHEMA,
+    Routes, ROUTES_SCHEMA,
+    Schedules, SCHEDULES_SCHEMA,
+    Stops, STOPS_SCHEMA,
+    Trips, TRIPS_SCHEMA
+)
+
+
+TMP = os.path.join(os.path.realpath(os.path.dirname(__file__)), 'tmp')
 
 
 @dataclass
 class GTFS:
     '''
-    Base dataclass for reading and managing GTFS datasets.
+    Base dataclass database for reading and managing GTFS datasets.
     
     Attributes:
-        agencies (dict[str, Agency]):
-            a dict mapping `str` IDs to `Agency` records
-        feed (Feed):
-            the `Feed` of the GTFS dataset
         name (str):
             the name of the GTFS dataset
-        path (str):
-            the path to the GTFS dataset
-        routes (dict[str, Route]):
-            a dict mapping `str` IDs to `Route` records
-        schedules (dict[str, Schedule]):
-            a dict mapping `str` IDs to `Schedule` records
-        trips (dict[str, Trip]):
-            a dict mapping `str` IDs to `Trip` records
+        feed (Feed):
+            the `Feed` of the GTFS dataset
+        agencies (Agencies):
+            an `Agencies` table mapping `str` IDs to `Agency` records
+        routes (Routes):
+            a `Routes` table mapping `str` IDs to `Route` records
+        schedules (Schedules):
+            a `Schedules` table mapping `str` service IDs to `Schedule` records
+        stops (Stops):
+            a `Stops` table mapping `str` IDs to `Stop` records
+        trips (Trips):
+            a `Trips` table mapping `str` IDs to `Trip` records
     '''
 
     ### ATTRIBUTES ###
-    # Required fields
-    agencies: dict[str, g.Agency]
-    '''a dict mapping `str` IDs to `Agency` records'''
-    feed: g.Feed
-    '''the `Feed` of the GTFS dataset'''
-    name: str
+    # Metadata
+    name: str = d.field(m.fields.String())
     '''the name of the GTFS dataset'''
-    path: str
-    '''the path to the GTFS dataset'''
-    routes: dict[str, g.Route]
-    '''a dict mapping `str` IDs to `Route` records'''
-    schedules: dict[str, h.Schedule]
-    '''a dict mapping `str` IDs to `Schedule` records'''
-    trips: dict[str, h.Trip]
-    '''a dict mapping `str` IDs to `Trip` records'''
+    feed: Feed = d.field(m.fields.Nested(FEED_SCHEMA))
+    '''a `Feed` record describing the GTFS dataset'''
+
+    # Tables
+    agencies: Agencies = d.field(m.fields.Nested(AGENCIES_SCHEMA))
+    '''an `Agencies` table mapping `str` IDs to `Agency` records'''
+    routes: Routes = d.field(m.fields.Nested(ROUTES_SCHEMA))
+    '''a `Routes` table mapping `str` IDs to `Route` records'''
+    schedules: Schedules = d.field(m.fields.Nested(SCHEDULES_SCHEMA))
+    '''a `Schedules` table mapping `str` service IDs to `Schedule` records'''
+    stops: Stops = d.field(m.fields.Nested(STOPS_SCHEMA))
+    '''a `Stops` table mapping `str` IDs to `Stop` records'''
+    trips: Trips = d.field(m.fields.Nested(TRIPS_SCHEMA))
+    '''a `Trips` table mapping `str` IDs to `Trip` records'''
 
 
     ### CLASS METHODS ###
     @classmethod
-    def load (cls, name: str, path: str) -> GTFS:
-        print('loading agencies...')
-        agencies = {
-            a.id: a for a in GTFS.load_list(
-                os.path.join(path, 'agency.txt'), g.AGENCY_SCHEMA
-            )
-        }
-        print('loading feed info...')
-        feed = GTFS.load_list(
-            os.path.join(path, 'feed_info.txt'), g.FEED_SCHEMA
-        )[0]
-        print('loading routes...')
-        routes = {
-            r.id: r for r in GTFS.load_list(
-                os.path.join(path, 'routes.txt'), g.ROUTE_SCHEMA
-            )
-        }
-        print('loading schedules...')
-        calendars: list[g.Calendar] = GTFS.load_list(
-            os.path.join(path, 'calendar.txt'), g.CALENDAR_SCHEMA
-        )
-        dates: list[g.CalendarDate] = GTFS.load_list(
-            os.path.join(path, 'calendar_dates.txt'), g.CALENDAR_DATE_SCHEMA
-        )
-        service_ids = set(
-            [c.service_id for c in calendars] + [d.service_id for d in dates]
-        )
-        schedules = {
-            sid: h.Schedule(
-                additions=[
-                    d for d in dates 
-                    if d.exception == g.ExceptionType.ADD and \
-                        d.service_id == sid
-                ],
-                calendars=[c for c in calendars if c.service_id == sid],
-                exceptions=[
-                    d for d in dates
-                    if d.exception == g.ExceptionType.REMOVE and \
-                        d.service_id == sid
-                ]
-            ) for sid in service_ids
-        }
-        print('loading stop times...')
-        stop_times: list[g.StopTime] = GTFS.load_list(
-            os.path.join(path, 'stop_times.txt'), g.STOP_TIME_SCHEMA
-        )
-        print('loading trips...')
-        trips: list[g.Trip] = [
-            h.Trip.from_gtfs(trip, stop_times) for trip in GTFS.load_list(
-                os.path.join(path, 'trips.txt'), g.TRIP_SCHEMA
-            )
-        ]
-
-        return GTFS(
-            agencies=agencies, 
-            feed=feed, 
-            name=name, 
-            path=path, 
-            routes=routes, 
-            schedules=schedules, 
-            trips=trips
-        )
-
-
-    @classmethod
-    def load_list (cls, path: str, schema: Schema) -> list:
+    def load (
+                cls,
+                name: str,
+                gtfs_path: Optional[str] = None,
+                gtfs_sub: Optional[str] = None,
+                gtfs_uri: Optional[str] = None,
+                mgtfs_path: Optional[str] = None
+            ) -> GTFS:
         '''
-        Reads a CSV file and returns a list of deserialized records.
+        Returns a `GTFS` object containing minified GTFS data loaded from local
+        files or fetched from a remote source.
+
+        If provided, `mgtfs_path` is checked first for a mGTFS dataset. If it
+        exists, the `GTFS` object is created from it and returned; otherwise,
+        `load` falls back to one of the following:
+        
+        - loading a unzipped local GTFS dataset at `gtfs_path`
+        - fetching a zipped remote GTFS dataset at `gtfs_uri` with an optional \
+            `gtfs_sub` for nested GTFS datasets
+
+        If `mgtfs_path` was specified but `load` fell back to a different 
+        method, the newly parsed mGTFS will be written to `mgtfs_path` to 
+        improve performance on subsequent loads.
 
         Parameters:
-            path (str):
-                the path of the CSV file to load data from
-            schema (marshmallow.Schema):
-                the Schema for the records in the CSV file
-
-        Returns:
-            records (list[T]):
-                a list of deserialized records
-        '''
-        print('\treading data from CSV...')
-        data: list[str]
-        with open(path, 'r') as file:
-            data = file.readlines()
-
-        header = data[0].rstrip().split(',')
-        print('\tparsing data...')
-        records = []
-        for line in data[1:]:
-            if len(line) == 0: continue
-            records.append(
-                schema.load({
-                    h: v if len(v) > 0 else None
-                    for h, v in zip(
-                        header,
-                        line.rstrip().split(',')
-                    )
-                })
-            )
-        return records
-    
-
-    ### METHODS ###        
-    def filtered (self, filter: Callable[[h.Trip], bool]) -> GTFS:
-        '''
-        Returns a GTFS dataset filtered according to `filter`
-
-        Parameters:
-            filter (Callable[[Trip], bool]):
-                the filter to use on the GTFS dataset
+            name (str):
+                the name of the GTFS dataset
+            gtfs_path (Optional[str]):
+                the path to a local GTFS dataset
+            gtfs_sub (Optional[str]):
+                the subdirectory to use when fetching a remote GTFS dataset
+            gtfs_uri (Optional[str]):
+                the URI to use when fetching a remote GTFS dataset
+            mgtfs_path (Optional[str]):
+                the path to a local mGTFS dataset
         
         Returns:
             gtfs (GTFS):
-                a GTFS dataset filtered according to `filter`
+                a `GTFS` object containing the minified GTFS dataset
         '''
+        if mgtfs_path and os.path.exists(mgtfs_path):
+            data = {}
+            with open(mgtfs_path, 'r') as file:
+                data = json.load(file)
+            return GTFS_SCHEMA.load(data)
+        
+        if not gtfs_path:
+            if os.path.exists(TMP): shutil.rmtree(TMP)
+            os.mkdir(TMP)
+            zip_path = os.path.join(TMP, f'{name}.zip')
+            request.urlretrieve(gtfs_uri, zip_path)
+            with zipfile.ZipFile(zip_path) as zip:
+                zip.extractall(TMP)
+            os.remove(zip_path)
+            if gtfs_sub:
+                zip_name = f'{gtfs_sub}.zip'
+                zip_path = os.path.join(TMP, zip_name)
+                for entry in os.scandir(TMP):
+                    if entry.name != zip_name:
+                        os.remove(entry.path)            
+                with zipfile.ZipFile(zip_path) as zip:
+                    zip.extractall(TMP)
+                os.remove(zip_path)
+            path = TMP
+        else:
+            path = gtfs_path
+
+        g = GTFS(
+            name=name, 
+            feed=Feed.from_gtfs(path),
+            agencies=Agencies.from_gtfs(path), 
+            routes=Routes.from_gtfs(path), 
+            schedules=Schedules.from_gtfs(path),
+            stops=Stops.from_gtfs(path),
+            trips=Trips.from_gtfs(path)
+        )
+
+        if not gtfs_path: shutil.rmtree(TMP)
+        if mgtfs_path: GTFS.save(g, mgtfs_path)
+
+        return g
+
+
+    @classmethod
+    def save (cls, gtfs: GTFS, mgtfs_path: str):
+        '''
+        Writes a `GTFS` object to a `.json` file at `mgtfs_path`.
+
+        Parameters:
+            gtfs (GTFS):
+                the `GTFS` to dump to file
+            mgtfs_path (str):
+                the `.json` file to dump the `GTFS` object to
+        '''
+        data = GTFS_SCHEMA.dump(gtfs)
+        with open(mgtfs_path, 'w') as file:
+            json.dump(data, file)
+
+
+    ### METHODS ###
+    def _ref (self, trips: Trips) -> GTFS:
         return GTFS(
-            agencies=self.agencies,
-            feed=self.feed,
-            name=self.name,
-            path=self.path,
-            routes=self.routes,
-            schedules=self.schedules,
-            trips={
-                trip.id: trip for trip in self.trips.values()
-                if filter(trip)
-            }
+            self.name,
+            self.feed,
+            self.agencies,
+            self.routes,
+            self.schedules,
+            self.stops,
+            trips
         )
     
-    def on (self, date: pydate) -> GTFS:
+    def connecting (self, stop_a_id: str, stop_b_id: str) -> GTFS:
         '''
-        Return a GTFS dataset containing only the trips starting on `date`.
+        Returns a `GTFS` object containing only the trips connecting the stops
+        corresponding to `stop_a_id` and `stop_b_id`.
+
+        Parameters:
+            stop_a_id (str):
+                the unique ID corresponding to the starting stop
+            stop_b_id (str):
+                the unique ID corresponding to the ending stop
+
+        Returns:
+            gtfs (GTFS)
+                a `GTFS` object containing only the trips connecting the stops
+                corresponding to `stop_a_id` and `stop_b_id`
+        '''
+        return self._ref(self.trips.connecting(stop_a_id, stop_b_id))
+    
+    def on_date (self, date: pydate) -> GTFS:
+        '''
+        Returns a `GTFS` object containing only the trips occuring on `date`
 
         Parameters:
             date (date):
-                the date to filter the GTFS to
+                the date to find trips occuring on
 
         Returns:
             gtfs (GTFS):
-                the filtered GTFS dataset
+                a `GTFS` object containing only the trips occuring on `date`
         '''
-        return self.filtered(
-            lambda t: self.schedules[t.service_id].active(date)
-        )
+        return self._ref(self.trips.on_date(self.schedules.on_date(date)))
+
+    def today (self) -> GTFS:
+        '''
+        Returns a `GTFS` object containing only the trips occuring on the
+        current date.'
+        
+        Returns:
+            gtfs (GTFS):
+                a `GTFS` object containing only the trips occuring on the
+                current date
+        '''
+        return self.on_date(pydate.today())
+
+    
+
+
+
+GTFS_SCHEMA = d.schema(GTFS)

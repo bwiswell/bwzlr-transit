@@ -35,8 +35,9 @@ class CalendarDate:
     date: pydate = d.field(m.fields.Date(data_key='date', format='%Y%m%d'))
     '''the date when the service exception occurs'''
     exception: ExceptionType = d.field(
-        m.fields.Function(
-            deserialize=lambda et: ExceptionType(int(et)), 
+        m.fields.Enum(
+            ExceptionType,
+            by_value=True,
             data_key='exception_type'
         )
     )
