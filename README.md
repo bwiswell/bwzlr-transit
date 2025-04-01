@@ -30,21 +30,13 @@ gtfs.zip
     ...
 ```
 
-mGTFS is a minimal representation of the parts of these tables relevant to queries about agency, route, schedule, stop, and trip stored in a single `.json` file with the following structure:
+mGTFS is a minimal representation of the parts of these tables relevant to queries about agency, route, schedule, stop, and trip stored in a single `.json` file.
 
-```ts
-type MGTFS = {
-    name: string
-    feed: {
-        contact_email?: string
-    }
-}
-```
-```python
+```json
 {
     "name": "dataset-name",
     "feed": {
-        "contact_email": null,
+        ...
     },
     "agencies": {
         "agency-a": {
@@ -129,7 +121,7 @@ gtfs = bt.load(
     gtfs_path = 'path/to/gtfs/data',                    # Optional, local path to the GTFS dataset
     gtfs_sub = 'subdirectory',                          # Optional, for nested GTFS datasets
     gtfs_uri = 'https://www.example.com/gtfs/data.zip', # Optional, URI of the GTFS dataset
-    mgtfs_path = 'path/to/minified/gtfs/data'           # Optional, path to save minified data
+    mgtfs_path = 'path/to/minified/gtfs/data'           # Optional, local path to the load/save the mGTFS
 )
 ```
 
