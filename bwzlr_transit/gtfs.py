@@ -77,7 +77,38 @@ class GTFS:
                 gtfs_uri: Optional[str] = None,
                 mgtfs_path: Optional[str] = None
             ) -> GTFS:
+        '''
+        Returns a `GTFS` object containing minified GTFS data loaded from local
+        files or fetched from a remote source.
+
+        If provided, `mgtfs_path` is checked first for a mGTFS dataset. If it
+        exists, the `GTFS` object is created from it and returned; otherwise,
+        `load` falls back to one of the following:
         
+        - loading a unzipped local GTFS dataset at `gtfs_path`
+        - fetching a zipped remote GTFS dataset at `gtfs_uri` with an optional \
+            `gtfs_sub` for nested GTFS datasets
+
+        If `mgtfs_path` was specified but `load` fell back to a different 
+        method, the newly parsed mGTFS will be written to `mgtfs_path` to 
+        improve performance on subsequent loads.
+
+        Parameters:
+            name (str):
+                the name of the GTFS dataset
+            gtfs_path (Optional[str]):
+                the path to a local GTFS dataset
+            gtfs_sub (Optional[str]):
+                the subdirectory to use when fetching a remote GTFS dataset
+            gtfs_uri (Optional[str]):
+                the URI to use when fetching a remote GTFS dataset
+            mgtfs_path (Optional[str]):
+                the path to a local mGTFS dataset
+        
+        Returns:
+            gtfs (GTFS):
+                a `GTFS` object containing the minified GTFS dataset
+        '''
         if mgtfs_path and os.path.exists(mgtfs_path):
             data = {}
             with open(mgtfs_path, 'r') as file:
@@ -123,6 +154,15 @@ class GTFS:
 
     @classmethod
     def save (cls, gtfs: GTFS, mgtfs_path: str):
+        '''
+        Writes a `GTFS` object to a `.json` file at `mgtfs_path`.
+
+        Parameters:
+            gtfs (GTFS):
+                the `GTFS` to dump to file
+            mgtfs_path (str):
+                the `.json` file to dump the `GTFS` object to
+        '''
         data = GTFS_SCHEMA.dump(gtfs)
         with open(mgtfs_path, 'w') as file:
             json.dump(data, file)
@@ -141,12 +181,47 @@ class GTFS:
         )
     
     def connecting (self, stop_a_id: str, stop_b_id: str) -> GTFS:
+        '''
+        Returns a `GTFS` object containing only the trips connecting the stops
+        corresponding to `stop_a_id` and `stop_b_id`.
+
+        Parameters:
+            stop_a_id (str):
+                the unique ID corresponding to the starting stop
+            stop_b_id (str):
+                the unique ID corresponding to the ending stop
+
+        Returns:
+            gtfs (GTFS)
+                a `GTFS` object containing only the trips connecting the stops
+                corresponding to `stop_a_id` and `stop_b_id`
+        '''
         return self._ref(self.trips.connecting(stop_a_id, stop_b_id))
     
     def on_date (self, date: pydate) -> GTFS:
+        '''
+        Returns a `GTFS` object containing only the trips occuring on `date`
+
+        Parameters:
+            date (date):
+                the date to find trips occuring on
+
+        Returns:
+            gtfs (GTFS):
+                a `GTFS` object containing only the trips occuring on `date`
+        '''
         return self._ref(self.trips.on_date(self.schedules.on_date(date)))
 
     def today (self) -> GTFS:
+        '''
+        Returns a `GTFS` object containing only the trips occuring on the
+        current date.'
+        
+        Returns:
+            gtfs (GTFS):
+                a `GTFS` object containing only the trips occuring on the
+                current date
+        '''
         return self.on_date(pydate.today())
 
     
