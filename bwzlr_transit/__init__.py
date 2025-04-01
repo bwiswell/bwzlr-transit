@@ -1,7 +1,6 @@
 import os
 import shutil
 
-from .api import fetch_gtfs, load_gtfs, load_minified_gtfs, save_minified_gtfs
 from .gtfs import GTFS
 
 __version__ = '0.1.0'

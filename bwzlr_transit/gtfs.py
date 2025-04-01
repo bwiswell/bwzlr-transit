@@ -1,6 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import json
+import os
+import shutil
+from typing import Optional
+from urllib import request
+import zipfile
 
 import desert as d
 import marshmallow as m
@@ -13,6 +19,9 @@ from .tables import (
     Stops, STOPS_SCHEMA,
     Trips, TRIPS_SCHEMA
 )
+
+
+TMP = os.path.join(os.path.realpath(os.path.dirname(__file__)), 'tmp')
 
 
 @dataclass
@@ -55,6 +64,66 @@ class GTFS:
     '''a `Stops` table mapping `str` IDs to `Stop` records'''
     trips: Trips = d.field(m.fields.Nested(TRIPS_SCHEMA))
     '''a `Trips` table mapping `str` IDs to `Trip` records'''
+
+
+    ### CLASS METHODS ###
+    @classmethod
+    def load (
+                cls,
+                name: str,
+                gtfs_path: Optional[str] = None,
+                gtfs_sub: Optional[str] = None,
+                gtfs_uri: Optional[str] = None,
+                mgtfs_path: Optional[str] = None
+            ) -> GTFS:
+        
+        if mgtfs_path and os.path.exists(mgtfs_path):
+            data = {}
+            with open(mgtfs_path, 'r') as file:
+                data = json.load(file)
+            return GTFS_SCHEMA.load(data)
+        
+        if not gtfs_path:
+            if os.path.exists(TMP): shutil.rmtree(TMP)
+            os.mkdir(TMP)
+            zip_path = os.path.join(TMP, f'{name}.zip')
+            request.urlretrieve(gtfs_uri, zip_path)
+            with zipfile.ZipFile(zip_path) as zip:
+                zip.extractall(TMP)
+            os.remove(zip_path)
+            if gtfs_sub:
+                zip_name = f'{gtfs_sub}.zip'
+                zip_path = os.path.join(TMP, zip_name)
+                for entry in os.scandir(TMP):
+                    if entry.name != zip_name:
+                        os.remove(entry.path)            
+                with zipfile.ZipFile(zip_path) as zip:
+                    zip.extractall(TMP)
+                os.remove(zip_path)
+            path = TMP
+        else:
+            path = gtfs_path
+
+        g = GTFS(
+            name=name, 
+            feed=Feed.from_gtfs(path),
+            agencies=Agencies.from_gtfs(path), 
+            routes=Routes.from_gtfs(path), 
+            schedules=Schedules.from_gtfs(path), 
+            trips=Trips.from_gtfs(path)
+        )
+
+        if not gtfs_path: shutil.rmtree(TMP)
+        if mgtfs_path: GTFS.save(g, mgtfs_path)
+
+        return g
+
+
+    @classmethod
+    def save (cls, gtfs: GTFS, mgtfs_path: str):
+        data = GTFS_SCHEMA.dump(gtfs)
+        with open(mgtfs_path, 'w') as file:
+            json.dump(data, file)
 
 
 GTFS_SCHEMA = d.schema(GTFS)
