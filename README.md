@@ -57,7 +57,7 @@ gtfs = bt.GTFS.load(
 
 ## Example
 ```python
-import bwzlr_transit
+import bwzlr_transit as bt
 
 JEFFERSON_STATION = '90006'
 WASHINGTON_LANE_STATION = '90714'
