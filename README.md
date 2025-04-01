@@ -57,7 +57,7 @@ gtfs = bt.GTFS.load(
 
 ## Example
 ```python
-import bwzlr_transit
+import bwzlr_transit as bt
 
 JEFFERSON_STATION = '90006'
 WASHINGTON_LANE_STATION = '90714'
@@ -68,5 +68,5 @@ g = bt.GTFS.load('SEPTA', gtfs_uri=URI, gtfs_sub='google_rail')
 g = g.today().connecting(JEFFERSON_STATION, WASHINGTON_LANE_STATION)
 
 for trip in g.trips.trips:
-    print(trip)
+    print(trip.id)
 ```
