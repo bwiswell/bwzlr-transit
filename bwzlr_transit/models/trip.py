@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import time
 from enum import Enum
 from typing import Optional
 
@@ -6,6 +7,7 @@ import desert as d
 import marshmallow as m
 
 from .accessibility import Accessibility
+from .stop_time import StopTime
 from .timetable import Timetable, TIMETABLE_SCHEMA
 
 
@@ -108,8 +110,31 @@ class Trip:
 
 
     ### METHODS ###
+    def between (self, start: time, end: time) -> bool:
+        return self.timetable.between(start, end)
+
     def connects (self, stop_a_id: str, stop_b_id: str) -> bool:
+        '''
+        Returns a `bool` indicating if the `Timetable` for the `Trip` record
+        contains chronologically ordered entries for both `stop_a_id` and 
+        `stop_b_id`.
+
+        Parameters:
+            stop_a_id (str):
+                the unique ID associated with the first stop
+            stop_b_id (str):
+                the unique ID associated with the second stop
+
+        Returns:
+            a `bool` indicating if the `Timetable` for the `Trip` record
+            contains chronologically ordered entries for both `stop_a_id` and 
+            `stop_b_id`.
+        '''
         return self.timetable.connects(stop_a_id, stop_b_id)
+    
+    @property
+    def location (self) -> tuple[Optional[StopTime], Optional[StopTime]]:
+        return self.timetable.location
 
 
 
