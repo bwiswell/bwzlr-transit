@@ -135,5 +135,11 @@ class Trips:
             if t.service_id in service_ids
         })
     
+    def on_route (self, route_id: str) -> Trips:
+        return Trips({
+            t.id: t for t in self.trips
+            if t.route_id == route_id
+        })
+    
 
 TRIPS_SCHEMA = d.schema(Trips)

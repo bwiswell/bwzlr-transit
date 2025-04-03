@@ -180,6 +180,9 @@ class GTFS:
             trips
         )
     
+    def between (self, start: pydate, end: pydate) -> GTFS:
+        return self._ref(self.trips.between(start, end))
+    
     def connecting (self, stop_a_id: str, stop_b_id: str) -> GTFS:
         '''
         Returns a `GTFS` object containing only the trips connecting the stops
@@ -211,6 +214,9 @@ class GTFS:
                 a `GTFS` object containing only the trips occuring on `date`
         '''
         return self._ref(self.trips.on_date(self.schedules.on_date(date)))
+    
+    def on_route (self, route_id: str) -> GTFS:
+        return self._ref(self.trips.on_route(route_id))
 
     def today (self) -> GTFS:
         '''
