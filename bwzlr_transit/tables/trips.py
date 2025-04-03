@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import time
 import os
 from typing import Optional
 
@@ -115,7 +116,13 @@ class Trips:
         return self.data.get(id, None)
     
 
-    ### METHODS ###
+    ### METHODS ###    
+    def between (self, start: time, end: time) -> Trips:
+        return Trips({
+            t.id: t for t in self.trips
+            if t.between(start, end)
+        })
+    
     def connecting (self, stop_a_id: str, stop_b_id: str) -> Trips:
         return Trips({
             t.id: t for t in self.trips
