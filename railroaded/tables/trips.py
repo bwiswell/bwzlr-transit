@@ -26,7 +26,6 @@ class Trips(s.Seared):
 
     ### ATTRIBUTES ###
     data: dict[str, Trip] = s.T(
-        'data',
         schema=Trip.SCHEMA,
         keyed=True,
         required=True

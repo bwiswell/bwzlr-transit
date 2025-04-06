@@ -27,7 +27,6 @@ class Stops(s.Seared):
 
     ### ATTRIBUTES ###
     data: dict[str, Stop] = s.T(
-        'data',
         schema=Stop.SCHEMA,
         keyed=True,
         required=True

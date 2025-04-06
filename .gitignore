@@ -175,3 +175,6 @@ cython_debug/
 
 # Local tests
 test.py
+
+# Local data
+railroaded/tmp/

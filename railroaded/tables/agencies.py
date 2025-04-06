@@ -26,7 +26,6 @@ class Agencies(s.Seared):
     ### ATTRIBUTES ###
     # Required
     data: dict[str, Agency] = s.T(
-        'data',
         schema=Agency.SCHEMA,
         keyed=True,
         required=True

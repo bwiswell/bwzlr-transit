@@ -28,7 +28,6 @@ class Routes(s.Seared):
     ### ATTRIBUTES ###
     # Required
     data: dict[str, Route] = s.T(
-        'data',
         schema=Route.SCHEMA,
         keyed=True,
         required=True

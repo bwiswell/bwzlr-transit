@@ -82,24 +82,26 @@ class StopTime(s.Seared):
 
     ### ATTRIBUTES ###
     # Foreign IDs
-    dropoff_booking_id: Optional[str] = s.Str('dropoff_booking_rule_id')
+    dropoff_booking_id: Optional[str] = s.Str(
+        data_key='dropoff_booking_rule_id'
+    )
     '''the unique ID of the pickup booking rule for the stop'''
-    location_id: Optional[str] = s.Str('location_id')
+    location_id: Optional[str] = s.Str()
     '''the unique ID of the GeoJSON location for the stop'''
-    location_group_id: Optional[str] = s.Str('location_group_id')
+    location_group_id: Optional[str] = s.Str()
     '''the unique ID of the location group the stop belongs to'''
-    pickup_booking_id: Optional[str] = s.Str('pickup_booking_rule_id')
+    pickup_booking_id: Optional[str] = s.Str(data_key='pickup_booking_rule_id')
     '''the unique ID of the pickup booking rule for the stop'''
-    stop_id: Optional[str] = s.Str('stop_id')
+    stop_id: Optional[str] = s.Str()
     '''the unique ID of the serviced stop'''
-    trip_id: str = s.Str('trip_id')
+    trip_id: str = s.Str()
     '''the unique ID of the trip including the stop'''
 
     # Required fields
-    index: int = s.Int('stop_sequence', required=True)
+    index: int = s.Int(data_key='stop_sequence', required=True)
     '''the sequence index of the stop'''
     timepoint: Timepoint = s.Enum(
-        'timepoint', enum=Timepoint, missing=Timepoint.EXACT
+        enum=Timepoint, missing=Timepoint.EXACT
     )
     '''the timepoint of the stop'''
 

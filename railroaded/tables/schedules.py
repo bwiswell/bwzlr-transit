@@ -27,7 +27,6 @@ class Schedules(s.Seared):
 
     ### ATTRIBUTES ###
     data: dict[str, Schedule] = s.T(
-        'data',
         schema=Schedule.SCHEMA,
         keyed=True,
         required=True
