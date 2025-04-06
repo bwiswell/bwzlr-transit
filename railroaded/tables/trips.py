@@ -1,23 +1,17 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from datetime import time
 import os
 from typing import Optional
 
-import desert as d
-import marshmallow as m
+import seared as s
 
-from ..models import (
-    StopTime, STOP_TIME_SCHEMA,
-    Timetable,
-    Trip, TRIP_SCHEMA
-)
+from ..models import StopTime, Timetable, Trip
 from ..util import load_list
 
 
-@dataclass
-class Trips:
+@s.seared
+class Trips(s.Seared):
     '''
     Serializable dataclass table mapping `str` IDs to `Trip` records.
 
@@ -31,17 +25,11 @@ class Trips:
     '''
 
     ### ATTRIBUTES ###
-    data: dict[str, Trip] = d.field(
-        m.fields.Function(
-            deserialize=lambda data: { 
-                id: TRIP_SCHEMA.load(d) 
-                for id, d in data.items() 
-            },
-            serialize=lambda data: { 
-                d.id: TRIP_SCHEMA.dump(d) 
-                for d in data.data.values() 
-            }
-        )
+    data: dict[str, Trip] = s.T(
+        'data',
+        schema=Trip.SCHEMA,
+        keyed=True,
+        required=True
     )
     '''a `dict` mapping `str` IDs to `Trip` records'''
 
@@ -64,7 +52,7 @@ class Trips:
 
         stops: list[StopTime] = load_list(
             os.path.join(path, 'stop_times.txt'), 
-            STOP_TIME_SCHEMA,
+            StopTime.SCHEMA,
             int_cols=['drop_off_type', 'pickup_type', 'timepoint']
         )
 
@@ -76,7 +64,7 @@ class Trips:
 
         trips: list[Trip] = load_list(
             path = os.path.join(path, 'trips.txt'),
-            schema = TRIP_SCHEMA,
+            schema = Trip.SCHEMA,
             int_cols=['bikes_allowed', 'wheelchair_accessible']
         )
 
@@ -140,6 +128,3 @@ class Trips:
             t.id: t for t in self.trips
             if t.route_id == route_id
         })
-    
-
-TRIPS_SCHEMA = d.schema(Trips)

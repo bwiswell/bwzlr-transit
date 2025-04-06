@@ -1,18 +1,16 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 import os
 from typing import Optional
 
-import desert as d
-import marshmallow as m
+import seared as s
 
-from ..models import Route, ROUTE_SCHEMA
+from ..models import Route
 from ..util import load_list
 
 
-@dataclass
-class Routes:
+@s.seared
+class Routes(s.Seared):
     '''
     Serializable dataclass table mapping `str` IDs to `Route` records.
 
@@ -28,17 +26,12 @@ class Routes:
     '''
 
     ### ATTRIBUTES ###
-    data: dict[str, Route] = d.field(
-        m.fields.Function(
-            deserialize=lambda data: { 
-                id: ROUTE_SCHEMA.load(d) 
-                for id, d in data.items() 
-            },
-            serialize=lambda data: { 
-                d.id: ROUTE_SCHEMA.dump(d) 
-                for d in data.data.values() 
-            }
-        )
+    # Required
+    data: dict[str, Route] = s.T(
+        'data',
+        schema=Route.SCHEMA,
+        keyed=True,
+        required=True
     )
     '''a `dict` mapping `str` IDs to `Route` records'''
 
@@ -59,7 +52,7 @@ class Routes:
         '''
         routes: list[Route] = load_list(
             path = os.path.join(path, 'routes.txt'),
-            schema = ROUTE_SCHEMA,
+            schema = Route.SCHEMA,
             int_cols=['route_type']
         )
         return Routes({ r.id: r for r in routes })
@@ -98,6 +91,3 @@ class Routes:
                 `None`
         '''
         return self.data.get(id, None)
-    
-
-ROUTES_SCHEMA = d.schema(Routes)

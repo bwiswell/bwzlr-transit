@@ -1,17 +1,15 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from datetime import date, datetime, time, timedelta
+from datetime import datetime, time
 from typing import Optional
 
-import desert as d
-import marshmallow as m
+import seared as s
 
-from .stop_time import StopTime, STOP_TIME_SCHEMA
+from .stop_time import StopTime
 
 
-@dataclass
-class Timetable:
+@s.seared
+class Timetable(s.Seared):
     '''
     Serializable dataclass table mapping `str` stop IDs to `StopTime` records.
 
@@ -29,15 +27,11 @@ class Timetable:
     '''
 
     ### ATTRIBUTES ###
-    data: dict[str, StopTime] = d.field(
-        m.fields.Function(
-            deserialize=lambda data: { 
-                id: STOP_TIME_SCHEMA.load(d) for id, d in data.items() 
-            },
-            serialize=lambda data: { 
-                d.stop_id: STOP_TIME_SCHEMA.dump(d) for d in data.data.values() 
-            }
-        )
+    data: dict[str, StopTime] = s.T(
+        'data',
+        schema=StopTime.SCHEMA,
+        keyed=True,
+        required=True
     )
     '''a `dict` mapping `str` stop IDs to `StopTime` records'''
 
@@ -147,7 +141,3 @@ class Timetable:
                 return None, self.start
             else:
                 return self.end, None
-            
-    
-
-TIMETABLE_SCHEMA = d.schema(Timetable)

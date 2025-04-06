@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from datetime import time
 from enum import Enum
 from typing import Optional
 
-import desert as d
-import marshmallow as m
+import seared as s
 
 from .stop_continuity import StopContinuity
 
@@ -29,8 +27,8 @@ class Timepoint(Enum):
     EXACT = 1
 
 
-@dataclass
-class StopTime:
+@s.seared
+class StopTime(s.Seared):
     '''
     A GTFS dataclass model for records found in `stop_times.txt`. Identifies a 
     transit route.
@@ -84,102 +82,51 @@ class StopTime:
 
     ### ATTRIBUTES ###
     # Foreign IDs
-    dropoff_booking_id: Optional[str] = d.field(
-        m.fields.String(data_key='dropoff_booking_rule_id', missing=None)
-    )
+    dropoff_booking_id: Optional[str] = s.Str('dropoff_booking_rule_id')
     '''the unique ID of the pickup booking rule for the stop'''
-    location_id: Optional[str] = d.field(
-        m.fields.String(data_key='location_id', missing=None)
-    )
+    location_id: Optional[str] = s.Str('location_id')
     '''the unique ID of the GeoJSON location for the stop'''
-    location_group_id: Optional[str] = d.field(
-        m.fields.String(data_key='location_group_id', missing=None)
-    )
+    location_group_id: Optional[str] = s.Str('location_group_id')
     '''the unique ID of the location group the stop belongs to'''
-    pickup_booking_id: Optional[str] = d.field(
-        m.fields.String(data_key='pickup_booking_rule_id', missing=None)
-    )
+    pickup_booking_id: Optional[str] = s.Str('pickup_booking_rule_id')
     '''the unique ID of the pickup booking rule for the stop'''
-    stop_id: Optional[str] = d.field(
-        m.fields.String(data_key='stop_id', missing=None)
-    )
+    stop_id: Optional[str] = s.Str('stop_id')
     '''the unique ID of the serviced stop'''
-    trip_id: str = d.field(m.fields.String(data_key='trip_id'))
+    trip_id: str = s.Str('trip_id')
     '''the unique ID of the trip including the stop'''
 
     # Required fields
-    index: int = d.field(m.fields.Integer(data_key='stop_sequence'))
+    index: int = s.Int('stop_sequence', required=True)
     '''the sequence index of the stop'''
-    timepoint: Timepoint = d.field(
-        m.fields.Enum(
-            Timepoint,
-            by_value=True,
-            data_key='timepoint',
-            missing=Timepoint.EXACT
-        )
+    timepoint: Timepoint = s.Enum(
+        'timepoint', enum=Timepoint, missing=Timepoint.EXACT
     )
     '''the timepoint of the stop'''
 
     # Optional fields
-    arrival_time: Optional[str] = d.field(
-        m.fields.String(data_key='arrival_time', missing=None)
-    )
+    arrival_time: Optional[str] = s.Str('arrival_time')
     '''the arrival time at the stop'''
-    departure_time: Optional[str] = d.field(
-        m.fields.String(data_key='departure_time', missing=None)
-    )
+    departure_time: Optional[str] = s.Str('departure_time')
     '''the departure time at the stop'''
-    dist_traveled: Optional[float] = d.field(
-        m.fields.Float(data_key='shape_dist_traveled', missing=None)
-    )
+    dist_traveled: Optional[float] = s.Float('shape_dist_traveled')
     '''the distance traveled from the first stop until this stop'''
-    dropoff_continuity: Optional[StopContinuity] = d.field(
-        m.fields.Enum(
-            StopContinuity,
-            by_value=True,
-            data_key='continuous_drop_off',
-            missing=None
-        )
+    dropoff_continuity: Optional[StopContinuity] = s.Enum(
+        'continuous_drop_off', enum=StopContinuity
     )
     '''the `StopContinuity` for dropoffs at the stop'''
-    dropoff_type: Optional[StopType] = d.field(
-        m.fields.Enum(
-            StopType,
-            by_value=True,
-            data_key='drop_off_type', 
-            missing=None
-        )
-    )
+    dropoff_type: Optional[StopType] = s.Enum('drop_off_type', enum=StopType)
     '''the `StopType` for dropoffs at the stop'''
-    end_pickup_dropoff: Optional[str] = d.field(
-        m.fields.String(data_key='end_pickup_drop_off_window', missing=None)
-    )
+    end_pickup_dropoff: Optional[str] = s.Str('end_pickup_drop_off_window')
     '''the end time for pickup and dropoff'''
-    headsign: Optional[str] = d.field(
-        m.fields.String(data_key='stop_headsign', missing=None)
-    )
+    headsign: Optional[str] = s.Str('stop_headsign')
     '''the headsign to display when this stop is the destination'''
-    pickup_continuity: Optional[StopContinuity] = d.field(
-        m.fields.Enum(
-            StopContinuity,
-            by_value=True,
-            data_key='continuous_pickup',
-            missing=None
-        )
+    pickup_continuity: Optional[StopContinuity] = s.Enum(
+        'continuous_pickup', enum=StopContinuity
     )
     '''the `StopContinuity` for pickups at the stop'''
-    pickup_type: Optional[StopType] = d.field(
-        m.fields.Enum(
-            StopType,
-            by_value=True,
-            data_key='pickup_type', 
-            missing=None
-        )
-    )
+    pickup_type: Optional[StopType] = s.Enum('pickup_type', enum=StopType)
     '''the `StopType` for pickups at the stop'''
-    start_pickup_dropoff: Optional[str] = d.field(
-        m.fields.String(data_key='start_pickup_drop_off_window', missing=None)
-    )
+    start_pickup_dropoff: Optional[str] = s.Str('start_pickup_drop_off_window')
     '''the start time for pickup and dropoff'''
 
 
@@ -229,6 +176,3 @@ class StopTime:
             return self.start_pickup_dropoff
         else:
             return self.arrival_time
-
-
-STOP_TIME_SCHEMA = d.schema(StopTime)

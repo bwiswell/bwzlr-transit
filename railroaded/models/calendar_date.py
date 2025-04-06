@@ -1,9 +1,7 @@
-from dataclasses import dataclass
 from datetime import date as pydate
 from enum import Enum
 
-import desert as d
-import marshmallow as m
+import seared as s
 
 
 class ExceptionType(Enum):
@@ -11,8 +9,8 @@ class ExceptionType(Enum):
     REMOVE = 2
 
 
-@dataclass
-class CalendarDate:
+@s.seared
+class CalendarDate(s.Seared):
     '''
     A GTFS dataclass model for records found in `calendar_dates.txt`. 
     Defines an exception to the service patterns defined in `calendar.txt`.
@@ -28,20 +26,13 @@ class CalendarDate:
 
     ### ATTRIBUTES ###
     # Foreign IDs
-    service_id: str = d.field(m.fields.String(data_key='service_id'))
+    service_id: str = s.Str('service_id', required=True)
     '''the ID of the service the calendar date modifies'''
     
     # Required fields
-    date: pydate = d.field(m.fields.Date(data_key='date', format='%Y%m%d'))
+    date: pydate = s.Date('date', format='%Y%m%d', required=True)
     '''the date when the service exception occurs'''
-    exception: ExceptionType = d.field(
-        m.fields.Enum(
-            ExceptionType,
-            by_value=True,
-            data_key='exception_type'
-        )
+    exception: ExceptionType = s.Enum(
+        'exception_type', enum=ExceptionType, required=True
     )
     '''the type of service exception specified'''
-
-
-CALENDAR_DATE_SCHEMA = d.schema(CalendarDate)

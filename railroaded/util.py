@@ -71,23 +71,23 @@ def split (
             filter: Callable[[T], bool]
         ) -> tuple[list[T], list[T]]:
     '''
-    Splits a `list` of `T` into two, using `filter` to decide which bucket
-    each element is sorted into.
+    Splits a `list` of `T` into two `list` of `T` containing all values in
+    `elements` for which `filter` returns `True` in the first `list` and all
+    values in `elements` for which `filter` returns `False` in the second.
 
     Parameters:
-    elements (list[T]):
-        the `list` of `T` elements to split
-    filter (Callable[[T], bool]):
-        a function that takes a single element as a parameter and returns
-        a `bool` indicating which output `list` to sort the element into
+        elements (list[T]):
+            the `list` of `T` elements to split
+        filter (Callable[[T], bool]):
+            a function that takes a single element as a parameter and returns a
+            `bool` indicating which output `list` to sort the element into
 
     Returns:
-    truthy (list[T]):
-        a `list` of `T` containing all values in `elements` for which
-        `filter` returns `True`
-    falsy (list[T]):
-        a `list` of `T` containing all values in `elements` for which
-        `filter` returns `False`
+        splits (tuple[list[T], list[T]]):
+            a `tuple` of two `list` of `T` containing all values in `elements`
+            for which `filter` returns `True` in the first `list` and all
+            values in `elements` for which `filter` returns `False` in the
+            second
     '''
     truthy: list[T] = []
     falsy: list[T] = []

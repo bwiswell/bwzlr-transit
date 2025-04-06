@@ -1,18 +1,16 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from datetime import date
 import os
 from typing import Optional
 
-import desert as d
-import marshmallow as m
+import seared as s
 
 from ..util import load_list
 
 
-@dataclass
-class Feed:
+@s.seared
+class Feed(s.Seared):
     '''
     A GTFS dataclass model for records found in `feed_info.txt`. Describes a 
     GTFS dataset and publisher.
@@ -40,45 +38,25 @@ class Feed:
 
     ### ATTRIBUTES ###
     # Required fields
-    lang: str = d.field(m.fields.String(data_key='feed_lang'))
+    lang: str = s.Str('feed_lang', required=True)
     '''the default language used for the text in this dataset'''
-    publisher_name: str = d.field(
-        m.fields.String(data_key='feed_publisher_name')
-    )
+    publisher_name: str = s.Str('feed_publisher_name', required=True)
     '''the name of the organization that publishes the dataset'''
-    publisher_url: str = d.field(
-        m.fields.String(data_key='feed_publisher_url')
-    )
+    publisher_url: str = s.Str('feed_publisher_url', required=True)
     '''the url of the dataset publishing organization's website'''
 
     # Optional fields
-    contact_email: Optional[str] = d.field(
-        m.fields.String(data_key='feed_contact_email', missing=None)
-    )
+    contact_email: Optional[str] = s.Str('feed_contact_email')
     '''the email address for communication regarding the GTFS dataset'''
-    contact_url: Optional[str] = d.field(
-        m.fields.String(data_key='feed_contact_url', missing=None)
-    )
+    contact_url: Optional[str] = s.Str('feed_contact_url')
     '''the URL for information regarding the GTFS dataset'''
-    default_lang: Optional[str] = d.field(
-        m.fields.String(data_key='default_lang', missing=None)
-    )
+    default_lang: Optional[str] = s.Str('default_lang')
     '''the language to use when the rider's language is unknown'''
-    end_date: Optional[date] = d.field(
-        m.fields.Date(
-            data_key='feed_end_date', format='%Y%m%d', missing=None
-        )
-    )
+    end_date: Optional[date] = s.Date('feed_end_date', format='%Y%m%d')
     '''the end date of the information provided in the GTFS dataset'''
-    start_date: Optional[date] = d.field(
-        m.fields.Date(
-            data_key='feed_start_date', format='%Y%m%d', missing=None
-        )
-    )
+    start_date: Optional[date] = s.Date('feed_start_date', format='%Y%m%d')
     '''the start date of the information provided in the GTFS dataset'''
-    version: str = d.field(
-        m.fields.String(data_key='feed_version', missing=None)
-    )
+    version: str = s.Str('feed_version')
     '''the current version of the GTFS dataset'''
 
 
@@ -98,8 +76,5 @@ class Feed:
         '''
         return load_list(
             os.path.join(path, 'feed_info.txt'), 
-            FEED_SCHEMA
+            Feed.SCHEMA
         )[0]
-
-
-FEED_SCHEMA = d.schema(Feed)

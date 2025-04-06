@@ -1,12 +1,10 @@
-from dataclasses import dataclass
 from datetime import date
 
-import desert as d
-import marshmallow as m
+import seared as s
 
 
-@dataclass
-class Calendar:
+@s.seared
+class Calendar(s.Seared):
     '''
     A GTFS dataclass model for records found in `calendar.txt`. Defines a \
     default schedule for a transit service.
@@ -39,27 +37,27 @@ class Calendar:
     
     ### ATTRIBUTES ###
     # Foreign IDs
-    service_id: str = d.field(m.fields.String(data_key='service_id'))
+    service_id: str = s.Str('service_id', required=True)
     '''the unique ID of the transit service the schedule is defined for'''
 
     # Required fields
-    end: date = d.field(m.fields.Date(data_key='end_date', format='%Y%m%d'))
+    end: date = s.Date('end_date', format='%Y%m%d', required=True)
     '''the end date of the service schedule'''
-    friday: bool = d.field(m.fields.Boolean(data_key='friday'))
+    friday: bool = s.Bool('friday', required=True)
     '''a `bool` indicating if the service is active on Fridays'''
-    monday: bool = d.field(m.fields.Boolean(data_key='monday'))
+    monday: bool = s.Bool('monday', required=True)
     '''a `bool` indicating if the service is active on Mondays'''
-    saturday: bool = d.field(m.fields.Boolean(data_key='saturday'))
+    saturday: bool = s.Bool('saturday', required=True)
     '''a `bool` indicating if the service is active on Saturdays'''
-    start: date = d.field(m.fields.Date(data_key='start_date', format='%Y%m%d'))
+    start: date = s.Date('start_date', format='%Y%m%d', required=True)
     '''the start date of the service schedule'''
-    sunday: bool = d.field(m.fields.Boolean(data_key='sunday'))
+    sunday: bool = s.Bool('sunday', required=True)
     '''a `bool` indicating if the service is active on Sundays'''
-    thursday: bool = d.field(m.fields.Boolean(data_key='thursday'))
+    thursday: bool = s.Bool('thursday', required=True)
     '''a `bool` indicating if the service is active on Thursdays'''
-    tuesday: bool = d.field(m.fields.Boolean(data_key='tuesday'))
+    tuesday: bool = s.Bool('tuesday', required=True)
     '''a `bool` indicating if the service is active on Tuesdays'''
-    wednesday: bool = d.field(m.fields.Boolean(data_key='wednesday'))
+    wednesday: bool = s.Bool('wednesday', required=True)
     '''a `bool` indicating if the service is active on Wednesdays'''
 
     @property
@@ -77,6 +75,3 @@ class Calendar:
             self.saturday,
             self.sunday
         ]
-
-
-CALENDAR_SCHEMA = d.schema(Calendar)

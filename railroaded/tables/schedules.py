@@ -1,23 +1,17 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from datetime import date as pydate
 import os
 from typing import Optional
 
-import desert as d
-import marshmallow as m
+import seared as s
 
-from ..models import (
-    Calendar, CALENDAR_SCHEMA,
-    CalendarDate, CALENDAR_DATE_SCHEMA,
-    Schedule, SCHEDULE_SCHEMA
-)
+from ..models import Calendar, CalendarDate, Schedule
 from ..util import load_list
 
 
-@dataclass
-class Schedules:
+@s.seared
+class Schedules(s.Seared):
     '''
     Serializable dataclass table mapping `str` service IDs to `Schedule`
     records.
@@ -32,17 +26,11 @@ class Schedules:
     '''
 
     ### ATTRIBUTES ###
-    data: dict[str, Schedule] = d.field(
-        m.fields.Function(
-            deserialize=lambda data: { 
-                id: SCHEDULE_SCHEMA.load(d) 
-                for id, d in data.items() 
-            },
-            serialize=lambda data: { 
-                d.service_id: SCHEDULE_SCHEMA.dump(d) 
-                for d in data.data.values()
-            }
-        )
+    data: dict[str, Schedule] = s.T(
+        'data',
+        schema=Schedule.SCHEMA,
+        keyed=True,
+        required=True
     )
     '''a `dict` mapping `str` service IDs to `Schedule` records'''
 
@@ -65,7 +53,7 @@ class Schedules:
 
         calendars: list[Calendar] = load_list(
             path = os.path.join(path, 'calendar.txt'), 
-            schema = CALENDAR_SCHEMA
+            schema = Calendar.SCHEMA
         )
 
         for cal in calendars:
@@ -76,7 +64,7 @@ class Schedules:
 
         dates: list[CalendarDate] = load_list(
             path = os.path.join(path, 'calendar_dates.txt'), 
-            schema = CALENDAR_DATE_SCHEMA,
+            schema = CalendarDate.SCHEMA,
             int_cols = ['exception_type']
         )
 
@@ -129,6 +117,3 @@ class Schedules:
             sid for sid in self.service_ids
             if self[sid].active(date)
         ]
-    
-
-SCHEDULES_SCHEMA = d.schema(Schedules)

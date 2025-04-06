@@ -1,14 +1,12 @@
-from dataclasses import dataclass
 from datetime import time
 from enum import Enum
 from typing import Optional
 
-import desert as d
-import marshmallow as m
+import seared as s
 
 from .accessibility import Accessibility
 from .stop_time import StopTime
-from .timetable import Timetable, TIMETABLE_SCHEMA
+from .timetable import Timetable
 
 
 class BikesAllowed(Enum):
@@ -20,8 +18,8 @@ class BikesAllowed(Enum):
     DISALLOWED = 2
 
 
-@dataclass
-class Trip:
+@s.seared
+class Trip(s.Seared):
     '''
     A GTFS dataclass model for records found in `routes.txt`. Identifies a 
     transit route.
@@ -53,59 +51,39 @@ class Trip:
 
     ### ATTRIBUTES ###
     # Model ID
-    id: str = d.field(m.fields.String(data_key='trip_id'))
+    id: str = s.Str('trip_id', required=True)
     '''the unique ID of the trip'''
 
     # Foreign IDs
-    block_id: Optional[str] = d.field(
-        m.fields.String(data_key='block_id', missing=None)
-    )
+    block_id: Optional[str] = s.Str('block_id')
     '''the unique ID of the block the trip belongs to'''
-    route_id: str = d.field(m.fields.String(data_key='route_id'))
+    route_id: str = s.Str('route_id', required=True)
     '''the unique ID of the route the trip belongs to'''
-    service_id: str = d.field(m.fields.String(data_key='service_id'))
+    service_id: str = s.Str('service_id', required=True)
     '''the unique ID of the service the trip belongs to'''
-    shape_id: Optional[str] = d.field(
-        m.fields.String(data_key='shape_id', missing=None)
-    )
+    shape_id: Optional[str] = s.Str('shape_id')
     '''the unique ID of the shape for the trip'''
 
     # Required fields
-    accessibility: Accessibility = d.field(
-        m.fields.Enum(
-            Accessibility,
-            by_value=True,
-            data_key='wheelchair_accessible',
-            missing=Accessibility.UNKNOWN
-        )
+    accessibility: Accessibility = s.Enum(
+        'wheelchair_accessible', 
+        enum=Accessibility, 
+        missing=Accessibility.UNKNOWN
     )
     '''the `Accessibility` of the trip'''
-    bikes: BikesAllowed = d.field(
-        m.fields.Enum(
-            BikesAllowed,
-            by_value=True,
-            data_key='bikes_allowed',
-            missing=BikesAllowed.UNKNOWN
-        )
+    bikes: BikesAllowed = s.Enum(
+        'bikes_allowed', enum=BikesAllowed, missing=BikesAllowed.UNKNOWN
     )
     '''the `BikesAllowed` of the trip'''
-    timetable: Timetable = d.field(
-        m.fields.Nested(TIMETABLE_SCHEMA, missing=None)
-    )
+    timetable: Timetable = s.T('timetable', schema=Timetable.SCHEMA)
     '''the `Timetable` associated with the trip'''
 
     # Optional fields
-    direction: Optional[bool] = d.field(
-        m.fields.Boolean(data_key='direction_id', missing=None)
-    )
+    direction: Optional[bool] = s.Str('direction_id')
     '''the direction of the trip'''
-    headsign: Optional[str] = d.field(
-        m.fields.String(data_key='trip_headsign', missing=None)
-    )
+    headsign: Optional[str] = s.Str('trip_headsign')
     '''the headsign to display for the trip'''
-    short_name: Optional[str] = d.field(
-        m.fields.String(data_key='trip_short_name', missing=None)
-    )
+    short_name: Optional[str] = s.Str('trip_short_name')
     '''a short name for the trip'''
 
 
@@ -135,7 +113,3 @@ class Trip:
     @property
     def location (self) -> tuple[Optional[StopTime], Optional[StopTime]]:
         return self.timetable.location
-
-
-
-TRIP_SCHEMA = d.schema(Trip)

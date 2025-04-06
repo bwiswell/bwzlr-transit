@@ -7,7 +7,7 @@ authors = ["Ben Wiswell <benjwiswell@gmail.com>"]
 [tool.poetry.dependencies]
 python = "^3.9"
 pandas = "^2.2.3"
-seared = {git = "https://www.github.com/bwiswell/seared.git"}
+seared = {git = "https://www.github.com/bwiswell/seared.git", rev = "version/0.1.7"}
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

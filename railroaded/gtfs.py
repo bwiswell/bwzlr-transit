@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from datetime import date as pydate
 import json
 import os
@@ -9,24 +8,23 @@ from typing import Optional
 from urllib import request
 import zipfile
 
-import desert as d
-import marshmallow as m
+import seared as s
 
-from .models import Feed, FEED_SCHEMA
+from .models import Feed
 from .tables import (
-    Agencies, AGENCIES_SCHEMA,
-    Routes, ROUTES_SCHEMA,
-    Schedules, SCHEDULES_SCHEMA,
-    Stops, STOPS_SCHEMA,
-    Trips, TRIPS_SCHEMA
+    Agencies,
+    Routes,
+    Schedules,
+    Stops,
+    Trips
 )
 
 
 TMP = os.path.join(os.path.realpath(os.path.dirname(__file__)), 'tmp')
 
 
-@dataclass
-class GTFS:
+@s.seared
+class GTFS(s.Seared):
     '''
     Base dataclass database for reading and managing GTFS datasets.
     
@@ -49,27 +47,27 @@ class GTFS:
 
     ### ATTRIBUTES ###
     # Metadata
-    name: str = d.field(m.fields.String())
+    name: str = s.Str('name', required=True)
     '''the name of the GTFS dataset'''
-    feed: Feed = d.field(m.fields.Nested(FEED_SCHEMA))
+    feed: Feed = s.T('feed', schema=Feed.SCHEMA)
     '''a `Feed` record describing the GTFS dataset'''
 
     # Tables
-    agencies: Agencies = d.field(m.fields.Nested(AGENCIES_SCHEMA))
+    agencies: Agencies = s.T('agencies', schema=Agencies.SCHEMA)
     '''an `Agencies` table mapping `str` IDs to `Agency` records'''
-    routes: Routes = d.field(m.fields.Nested(ROUTES_SCHEMA))
+    routes: Routes = s.T('routes', schema=Routes.SCHEMA)
     '''a `Routes` table mapping `str` IDs to `Route` records'''
-    schedules: Schedules = d.field(m.fields.Nested(SCHEDULES_SCHEMA))
+    schedules: Schedules = s.T('schedules', schema=Schedules.SCHEMA)
     '''a `Schedules` table mapping `str` service IDs to `Schedule` records'''
-    stops: Stops = d.field(m.fields.Nested(STOPS_SCHEMA))
+    stops: Stops = s.T('stops', schema=Stops.SCHEMA)
     '''a `Stops` table mapping `str` IDs to `Stop` records'''
-    trips: Trips = d.field(m.fields.Nested(TRIPS_SCHEMA))
+    trips: Trips = s.T('trips', schema=Trips.SCHEMA)
     '''a `Trips` table mapping `str` IDs to `Trip` records'''
 
 
     ### CLASS METHODS ###
     @classmethod
-    def load (
+    def read (
                 cls,
                 name: str,
                 gtfs_path: Optional[str] = None,
@@ -78,20 +76,20 @@ class GTFS:
                 mgtfs_path: Optional[str] = None
             ) -> GTFS:
         '''
-        Returns a `GTFS` object containing minified GTFS data loaded from local
+        Returns a `GTFS` object containing minified GTFS data read from local
         files or fetched from a remote source.
 
         If provided, `mgtfs_path` is checked first for a mGTFS dataset. If it
         exists, the `GTFS` object is created from it and returned; otherwise,
-        `load` falls back to one of the following:
+        `read` falls back to one of the following:
         
-        - loading a unzipped local GTFS dataset at `gtfs_path`
+        - reading a unzipped local GTFS dataset at `gtfs_path`
         - fetching a zipped remote GTFS dataset at `gtfs_uri` with an optional \
             `gtfs_sub` for nested GTFS datasets
 
-        If `mgtfs_path` was specified but `load` fell back to a different 
+        If `mgtfs_path` was specified but `read` fell back to a different 
         method, the newly parsed mGTFS will be written to `mgtfs_path` to 
-        improve performance on subsequent loads.
+        improve performance on subsequent reads.
 
         Parameters:
             name (str):
@@ -113,7 +111,7 @@ class GTFS:
             data = {}
             with open(mgtfs_path, 'r') as file:
                 data = json.load(file)
-            return GTFS_SCHEMA.load(data)
+            return GTFS.SCHEMA.load(data)
         
         if not gtfs_path:
             if os.path.exists(TMP): shutil.rmtree(TMP)
@@ -163,7 +161,7 @@ class GTFS:
             mgtfs_path (str):
                 the `.json` file to dump the `GTFS` object to
         '''
-        data = GTFS_SCHEMA.dump(gtfs)
+        data = GTFS.SCHEMA.dump(gtfs)
         with open(mgtfs_path, 'w') as file:
             json.dump(data, file)
 
@@ -229,9 +227,3 @@ class GTFS:
                 current date
         '''
         return self.on_date(pydate.today())
-
-    
-
-
-
-GTFS_SCHEMA = d.schema(GTFS)

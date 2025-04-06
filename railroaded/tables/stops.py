@@ -1,20 +1,16 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 import os
 from typing import Optional
 
-import desert as d
-import marshmallow as m
+import seared as s
 
-from ..models import (
-    Stop, STOP_SCHEMA
-)
+from ..models import Stop
 from ..util import load_list
 
 
-@dataclass
-class Stops:
+@s.seared
+class Stops(s.Seared):
     '''
     Serializable dataclass table mapping `str` IDs to `Stop` records.
 
@@ -30,17 +26,11 @@ class Stops:
     '''
 
     ### ATTRIBUTES ###
-    data: dict[str, Stop] = d.field(
-        m.fields.Function(
-            deserialize=lambda data: { 
-                id: STOP_SCHEMA.load(d) 
-                for id, d in data.items() 
-            },
-            serialize=lambda data: { 
-                d.id: STOP_SCHEMA.dump(d) 
-                for d in data.data.values() 
-            }
-        )
+    data: dict[str, Stop] = s.T(
+        'data',
+        schema=Stop.SCHEMA,
+        keyed=True,
+        required=True
     )
     '''a `dict` mapping `str` IDs to `Stop` records'''
 
@@ -61,7 +51,7 @@ class Stops:
         '''
         stops: list[Stop] = load_list(
             os.path.join(path, 'stops.txt'), 
-            STOP_SCHEMA,
+            Stop.SCHEMA,
             int_cols=['drop_off_type', 'pickup_type', 'timepoint']
         )
 
@@ -101,6 +91,3 @@ class Stops:
                 `None`
         '''
         return self.data.get(id, None)
-    
-
-STOPS_SCHEMA = d.schema(Stops)

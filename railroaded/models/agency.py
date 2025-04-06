@@ -1,12 +1,10 @@
-from dataclasses import dataclass
 from typing import Optional
 
-import desert as d
-import marshmallow as m
+import seared as s
 
 
-@dataclass
-class Agency:
+@s.seared
+class Agency(s.Seared):
     '''
     A GTFS dataclass model for records found in `agency.txt`. Identifies a 
     transit agency.
@@ -32,34 +30,23 @@ class Agency:
     
     ### ATTRIBUTES ###
     # Model ID
-    id: str = d.field(m.fields.String(data_key='agency_id', missing=''))
+    id: str = s.Str('agency_id', missing='')
     '''the unique ID of the transit agency'''
     
     # Required fields
-    name: str = d.field(m.fields.String(data_key='agency_name'))
+    name: str = s.Str('agency_name', required=True)
     '''the name of the transit agency'''
-    timezone: str = d.field(m.fields.String(data_key='agency_timezone'))
+    timezone: str = s.Str('agency_timezone', required=True)
     '''the timezone where the transit agency is located'''
-    url: str = d.field(m.fields.String(data_key='agency_url'))
+    url: str = s.Str('agency_url', required=True)
     '''the URL of the transit agency'''
 
     # Optional fields
-    email: Optional[str] = d.field(
-        m.fields.String(data_key='agency_email', missing=None)
-    )
+    email: Optional[str] = s.Str('agency_email')
     '''the customer service email of the transit agency'''
-    fare_url: Optional[str] = d.field(
-        m.fields.String(data_key='agency_fare_url', missing=None)
-    )
+    fare_url: Optional[str] = s.Str('agency_fare_url')
     '''the URL of a fare or ticket website for the transit agency'''
-    lang: Optional[str] = d.field(
-        m.fields.String(data_key='agency_lang', missing=None)
-    )
+    lang: Optional[str] = s.Str('agency_lang')
     '''the primary language used by the transit agency'''
-    phone: Optional[str] = d.field(
-        m.fields.String(data_key='agency_phone', missing=None)
-    )
+    phone: Optional[str] = s.Str('agency_phone')
     '''the voice telephone number for the transit agency'''
-
-
-AGENCY_SCHEMA = d.schema(Agency)

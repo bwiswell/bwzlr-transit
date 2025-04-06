@@ -1,20 +1,18 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from datetime import date as pydate
 
-import desert as d
-import marshmallow as m
+import seared as s
 
 from ..util import split
 
-from .calendar import Calendar, CALENDAR_SCHEMA
+from .calendar import Calendar
 from .calendar_date import CalendarDate, ExceptionType as ExType
-from .date_range import DateRange, DATE_RANGE_SCHEMA
+from .date_range import DateRange
 
 
-@dataclass
-class Schedule:
+@s.seared
+class Schedule(s.Seared):
     '''
     A dataclass model that defines a schedule for a transit service.
 
@@ -35,15 +33,16 @@ class Schedule:
 
     ### ATTRIBUTES ###
     # Foreign IDs
-    service_id: str = d.field(m.fields.String(data_key='service_id'))
+    service_id: str = s.Str('service_id', required=True)
     '''the unique ID of the service associated with the schedule'''
 
-    additions: list[pydate] = d.field(m.fields.List(m.fields.Date()))
+    # Required fields
+    additions: list[pydate] = s.Date('additions', many=True, required=True)
     '''a list of dates on which additional service is offered'''
-    exceptions: list[pydate] = d.field(m.fields.List(m.fields.Date()))
+    exceptions: list[pydate] = s.Date('exceptions', many=True, required=True)
     '''a list of dates on which service is suspended'''
-    ranges: list[DateRange] = d.field(
-        m.fields.List(m.fields.Nested(DATE_RANGE_SCHEMA))
+    ranges: list[DateRange] = s.T(
+        'ranges', schema=DateRange.SCHEMA, many=True, required=True
     )
     '''a `list` `DateRange` records associated with the schedule'''
 
@@ -122,6 +121,3 @@ class Schedule:
             if r.start <= date and date <= r.end:
                 return r.schedule[date.weekday()]
         return False
-    
-
-SCHEDULE_SCHEMA = d.schema(Schedule)

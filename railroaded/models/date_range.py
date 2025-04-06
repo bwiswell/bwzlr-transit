@@ -1,14 +1,12 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from datetime import date
 
-import desert as d
-import marshmallow as m
+import seared as s
 
 
-@dataclass(frozen=True)
-class DateRange:
+@s.seared
+class DateRange(s.Seared):
     '''
     A dataclass model for storing a weekly schedule for an inclusive date
     range.
@@ -24,14 +22,12 @@ class DateRange:
     '''
 
     ### ATTRIBUTES ###
-    end: date = d.field(m.fields.Date())
+    # Required fields
+    end: date = s.Date('end', required=True)
     '''the end `date` of the range'''
-    schedule: list[bool] = d.field(m.fields.List(m.fields.Boolean()))
+    schedule: list[bool] = s.Bool('schedule', many=True, required=True)
     '''
     a `list` of `bool` indicating if service is active when indexed by weekday
     '''
-    start: date = d.field(m.fields.Date())
+    start: date = s.Date('start', required=True)
     '''the start `date` of the range'''
-
-
-DATE_RANGE_SCHEMA = d.schema(DateRange)

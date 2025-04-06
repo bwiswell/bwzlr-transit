@@ -1,18 +1,16 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 import os
 from typing import Optional
 
-import desert as d
-import marshmallow as m
+import seared as s
 
-from ..models import Agency, AGENCY_SCHEMA
+from ..models import Agency
 from ..util import load_list
 
 
-@dataclass
-class Agencies:
+@s.seared
+class Agencies(s.Seared):
     '''
     Serializable dataclass table mapping `str` IDs to `Agency` records.
 
@@ -26,17 +24,12 @@ class Agencies:
     '''
 
     ### ATTRIBUTES ###
-    data: dict[str, Agency] = d.field(
-        m.fields.Function(
-            deserialize=lambda data: { 
-                id: AGENCY_SCHEMA.load(d) 
-                for id, d in data.items() 
-            },
-            serialize=lambda data: { 
-                d.id: AGENCY_SCHEMA.dump(d) 
-                for d in data.data.values() 
-            }
-        )
+    # Required
+    data: dict[str, Agency] = s.T(
+        'data',
+        schema=Agency.SCHEMA,
+        keyed=True,
+        required=True
     )
     '''a `dict` mapping `str` IDs to `Agency` records'''
 
@@ -57,7 +50,7 @@ class Agencies:
         '''
         agencies: list[Agency] = load_list(
             path = os.path.join(path, 'agency.txt'),
-            schema = AGENCY_SCHEMA
+            schema = Agency.SCHEMA
         )
         return Agencies({ a.id: a for a in agencies })
 
@@ -90,6 +83,3 @@ class Agencies:
                 `None`
         '''
         return self.data.get(id, None)
-    
-
-AGENCIES_SCHEMA = d.schema(Agencies)

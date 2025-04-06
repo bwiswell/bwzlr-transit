@@ -1,9 +1,7 @@
-from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
 
-import desert as d
-import marshmallow as m
+import seared as s
 
 from .accessibility import Accessibility
 
@@ -19,8 +17,8 @@ class LocationType(Enum):
     BOARDING_AREA = '4'
 
 
-@dataclass
-class Stop:
+@s.seared
+class Stop(s.Seared):
     '''
     A GTFS dataclass model for records found in `stops.txt`. Identifies a 
     transit location: a stop/platform, station, entrance/exit, generic node or 
@@ -62,80 +60,47 @@ class Stop:
     
     ### ATTRIBUTES ###
     # Model ID
-    id: str = d.field(m.fields.String(data_key='stop_id'))
+    id: str = s.Str('stop_id', required=True)
     '''the unique ID of the transit location'''
 
     # Foreign IDs
-    level_id: Optional[str] = d.field(
-        m.fields.String(data_key='level_id', missing=None)
-    )
+    level_id: Optional[str] = s.Str('level_id')
     '''the unique ID of the level of the transit location'''
-    parent_id: Optional[str] = d.field(
-        m.fields.String(data_key='parent_station', missing=None)
-    )
+    parent_id: Optional[str] = s.Str('parent_id')
     '''the unique ID of the transit location's parent'''
-    zone_id: Optional[str] = d.field(
-        m.fields.String(data_key='zone_id', missing=None)
-    )
+    zone_id: Optional[str] = s.Str('zone_id')
     '''the unique ID of the fare zone of the transit location'''
 
     # Required fields
-    accessibility: Accessibility = d.field(
-        m.fields.Enum(
-            Accessibility,
-            data_key='wheelchair_boarding',
-            by_value=True,
-            missing=Accessibility.UNKNOWN
-        )
+    accessibility: Accessibility = s.Enum(
+        'wheelchair_boarding',
+        enum=Accessibility,
+        missing=Accessibility.UNKNOWN
     )
     '''the `Accessibility` of the transit location for wheelchair boardings'''
-    name: str = d.field(
-        m.fields.String(data_key='stop_name', missing='unnamed')
-    )
+    name: str = s.Str('stop_name', missing='unnamed')
     '''the name of the transit location'''
-    type: LocationType = d.field(
-        m.fields.Enum(
-            LocationType, 
-            data_key='location_type', 
-            by_value=True,
-            missing=LocationType.STOP_OR_PLATFORM
-        )
+    type: LocationType = s.Enum(
+        'location_type', 
+        enum=LocationType, 
+        missing=LocationType.STOP_OR_PLATFORM
     )
     '''the `LocationType` of the transit location'''
 
     # Optional fields
-    code: Optional[str] = d.field(
-        m.fields.String(data_key='stop_code', missing=None)
-    )
+    code: Optional[str] = s.Str('stop_code')
     '''a short text/number identifying the transit location for riders'''
-    desc: Optional[str] = d.field(
-        m.fields.String(data_key='stop_desc', missing=None)
-    )
+    desc: Optional[str] = s.Str('stop_desc')
     '''a description of the transit location'''
-    lat: Optional[float] = d.field(
-        m.fields.Float(data_key='stop_lat', missing=None)
-    )
+    lat: Optional[float] = s.Float('stop_lat')
     '''the latitude of the transit location'''
-    lon: Optional[float] = d.field(
-        m.fields.Float(data_key='stop_lon', missing=None)
-    )
+    lon: Optional[float] = s.Float('stop_lon')
     '''the longitude of the transit location'''
-    platform_code: Optional[str] = d.field(
-        m.fields.String(data_key='platform_code', missing=None)
-    )
+    platform_code: Optional[str] = s.Str('platform_code')
     '''the unique ID of the platform to stop at'''
-    timezone: Optional[str] = d.field(
-        m.fields.String(data_key='stop_timezone', missing=None)
-    )
+    timezone: Optional[str] = s.Str('stop_timezone')
     '''the timezone of the transit location'''
-    tts_name: Optional[str] = d.field(
-        m.fields.String(data_key='tts_stop_name', missing=None)
-    )
+    tts_name: Optional[str] = s.Str('tts_stop_name')
     '''a text-to-speech readable version of the stop name'''
-    url: Optional[str] = d.field(
-        m.fields.String(data_key='stop_url', missing=None)
-    )
+    url: Optional[str] = s.Str('stop_url')
     '''the URL of a web page about the transit location'''
-
-
-STOP_SCHEMA = d.schema(Stop)

@@ -33,20 +33,20 @@ poetry add git+https://www.github.com/bwiswell/railroaded.git
 
 ## Usage
 
-`rr.GTFS` is the root object for handling GTFS data. the `rr.GTFS` object can be created from local or remote sources using `rr.GTFS.load`, and automatically handles parsing and converting the GTFS dataset to mGTFS. the resulting `rr.GTFS` object can be written out to a `.json` file using `rr.GTFS.save`.
+`rr.GTFS` is the root object for handling GTFS data. the `rr.GTFS` object can be created from local or remote sources using `rr.GTFS.read`, and automatically handles parsing and converting the GTFS dataset to mGTFS. the resulting `rr.GTFS` object can be written out to a `.json` file using `rr.GTFS.save`.
 
-#### Loading with `rr.GTFS.load`
+#### Reading with `rr.GTFS.read`
 
-If using a local mGTFS resource (preferred), `mgtfs_path` must be provided. If `mgtfs_path` is provided and no existing mGTFS dataset is found at the specified location, loading falls back to the options below. If loading is successful using one of those options, the minified version of the retrieved data will be saved to `mgtfs_path` to improve subsequent load times.
+If using a local mGTFS resource (preferred), `mgtfs_path` must be provided. If `mgtfs_path` is provided and no existing mGTFS dataset is found at the specified location, reading falls back to the options below. If reading is successful using one of those options, the minified version of the retrieved data will be saved to `mgtfs_path` to improve subsequent read times.
 
 If using a local GTFS resource, `gtfs_path` must be provided. The GTFS data should already be unzipped.
 
-If using a remote resource, `gtfs_uri` must be provided. `gtfs_sub` can optionally be provided to specify a subdirectory of the remote resource. `rr.GTFS.load` expects remote resources to be `.zip` files, or a `.zip` file of `.zip` files.
+If using a remote resource, `gtfs_uri` must be provided. `gtfs_sub` can optionally be provided to specify a subdirectory of the remote resource. `rr.GTFS.read` expects remote resources to be `.zip` files, or a `.zip` file of `.zip` files.
 
 ```python
 import railroaded as r
 
-gtfs = rr.GTFS.load(
+gtfs = rr.GTFS.read(
     name = 'your-dataset-name',                         # Name of the GTFS dataset
     gtfs_path = 'path/to/gtfs/data',                    # Optional, local path to the GTFS dataset
     gtfs_sub = 'subdirectory',                          # Optional, for nested GTFS datasets
@@ -57,13 +57,13 @@ gtfs = rr.GTFS.load(
 
 ## Example
 ```python
-import railroaded as r
+import railroaded as rr
 
 JEFFERSON_STATION = '90006'
 WASHINGTON_LANE_STATION = '90714'
 URI = 'https://www3.septa.org/developer/gtfs_public.zip'
 
-g = rr.GTFS.load('SEPTA', gtfs_uri=URI, gtfs_sub='google_rail')
+g = rr.GTFS.read('SEPTA', gtfs_uri=URI, gtfs_sub='google_rail')
 
 g = g.today().connecting(JEFFERSON_STATION, WASHINGTON_LANE_STATION)
 

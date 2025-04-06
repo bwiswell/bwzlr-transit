@@ -1,9 +1,7 @@
-from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
 
-import desert as d
-import marshmallow as m
+import seared as s
 
 from .stop_continuity import StopContinuity
 
@@ -24,8 +22,8 @@ class TransitType(Enum):
     MONORAIL = 12
 
 
-@dataclass
-class Route:
+@s.seared
+class Route(s.Seared):
     '''
     A GTFS dataclass model for records found in `routes.txt`. Identifies a 
     transit route.
@@ -63,69 +61,45 @@ class Route:
 
     ### ATTRIBUTES ###
     # Model ID
-    id: str = d.field(m.fields.String(data_key='route_id'))
+    id: str = s.Str('route_id', required=True)
     '''the unique ID of the route'''
     
     # Foreign IDs
-    agency_id: str = d.field(
-        m.fields.String(data_key='agency_id', missing='')
-    )
+    agency_id: str = s.Str('agency_id', missing='')
     '''the unique ID of the agency the route belongs to'''
-    network_id: Optional[str] = d.field(
-        m.fields.String(data_key='network_id', missing=None)
-    )
+    network_id: Optional[str] = s.Str('network_id')
     '''the unique ID of the network the route belongs to'''
 
     # Required fields
-    color: str = d.field(
-        m.fields.String(data_key='route_color', missing='FFFFFF')
-    )
+    color: str = s.Str('route_color', missing='FFFFFF', required=True)
     '''the color associated with the route'''
-    dropoffs: StopContinuity = d.field(
-        m.fields.Enum(
-            StopContinuity, by_value=True, missing=StopContinuity.NONE
-        )
+    dropoffs: StopContinuity = s.Enum(
+        'dropoffs', 
+        enum=StopContinuity, 
+        missing=StopContinuity.NONE
     )
     '''the continuity of dropoffs along the route'''
-    pickups: StopContinuity = d.field(
-        m.fields.Enum(
-            StopContinuity, by_value=True, missing=StopContinuity.NONE
-        )
+    pickups: StopContinuity = s.Enum(
+        'pickups', 
+        enum=StopContinuity, 
+        missing=StopContinuity.NONE
     )
     '''the continuity of pickups along the route'''
-    sort_idx: int = d.field(
-        m.fields.Integer(data_key='route_sort_order', missing=0)
-    )
+    sort_idx: int = s.Int('route_sort_order', missing=0)
     '''the sort position index of the route'''
-    text_color: Optional[str] = d.field(
-        m.fields.String(data_key='route_text_color', missing='000000')
-    )
+    text_color: Optional[str] = s.Str('route_text_color', missing='000000')
     '''the color to use for text drawn against `Route.color`'''
-    type: TransitType = d.field(
-        m.fields.Enum(
-            TransitType,
-            by_value=True,
-            data_key='route_type'
-        )
-    )
+    type: TransitType = s.Enum('route_type', enum=TransitType, required=True)
     '''the `TransitType` of the route'''
 
     # Optional fields
-    desc: Optional[str] = d.field(
-        m.fields.String(data_key='route_desc', missing=None)
-    )
+    desc: Optional[str] = s.Str('route_desc')
     '''a description of the route'''
-    long_name: Optional[str] = d.field(
-        m.fields.String(data_key='route_long_name', missing=None)
-    )
+    long_name: Optional[str] = s.Str('route_long_name')
     '''the full name of the route'''
-    short_name: Optional[str] = d.field(
-        m.fields.String(data_key='route_short_name', missing=None)
-    )
+    short_name: Optional[str] = s.Str('route_sort_name')
     '''the short name of the route'''
-    url: Optional[str] = d.field(
-        m.fields.String(data_key='route_url', missing=None)
-    )
+    url: Optional[str] = s.Str('route_url')
     '''the URL of a web page about the route'''
 
 
@@ -134,6 +108,3 @@ class Route:
     def name (self) -> str:
         '''the name of the route'''
         return self.short_name if self.long_name is None else self.long_name
-
-
-ROUTE_SCHEMA = d.schema(Route)
