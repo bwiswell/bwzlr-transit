@@ -47,21 +47,21 @@ class GTFS(s.Seared):
 
     ### ATTRIBUTES ###
     # Metadata
-    name: str = s.Str('name', required=True)
+    name: str = s.Str(required=True)
     '''the name of the GTFS dataset'''
-    feed: Feed = s.T('feed', schema=Feed.SCHEMA)
+    feed: Feed = s.T(schema=Feed.SCHEMA)
     '''a `Feed` record describing the GTFS dataset'''
 
     # Tables
-    agencies: Agencies = s.T('agencies', schema=Agencies.SCHEMA)
+    agencies: Agencies = s.T(schema=Agencies.SCHEMA)
     '''an `Agencies` table mapping `str` IDs to `Agency` records'''
-    routes: Routes = s.T('routes', schema=Routes.SCHEMA)
+    routes: Routes = s.T(schema=Routes.SCHEMA)
     '''a `Routes` table mapping `str` IDs to `Route` records'''
-    schedules: Schedules = s.T('schedules', schema=Schedules.SCHEMA)
+    schedules: Schedules = s.T(schema=Schedules.SCHEMA)
     '''a `Schedules` table mapping `str` service IDs to `Schedule` records'''
-    stops: Stops = s.T('stops', schema=Stops.SCHEMA)
+    stops: Stops = s.T(schema=Stops.SCHEMA)
     '''a `Stops` table mapping `str` IDs to `Stop` records'''
-    trips: Trips = s.T('trips', schema=Trips.SCHEMA)
+    trips: Trips = s.T(schema=Trips.SCHEMA)
     '''a `Trips` table mapping `str` IDs to `Trip` records'''
 
 
