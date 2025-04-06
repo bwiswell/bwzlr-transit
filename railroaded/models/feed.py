@@ -38,25 +38,29 @@ class Feed(s.Seared):
 
     ### ATTRIBUTES ###
     # Required fields
-    lang: str = s.Str('feed_lang', required=True)
+    lang: str = s.Str(data_key='feed_lang', required=True)
     '''the default language used for the text in this dataset'''
-    publisher_name: str = s.Str('feed_publisher_name', required=True)
+    publisher_name: str = s.Str(data_key='feed_publisher_name', required=True)
     '''the name of the organization that publishes the dataset'''
-    publisher_url: str = s.Str('feed_publisher_url', required=True)
+    publisher_url: str = s.Str(data_key='feed_publisher_url', required=True)
     '''the url of the dataset publishing organization's website'''
 
     # Optional fields
-    contact_email: Optional[str] = s.Str('feed_contact_email')
+    contact_email: Optional[str] = s.Str(data_key='feed_contact_email')
     '''the email address for communication regarding the GTFS dataset'''
-    contact_url: Optional[str] = s.Str('feed_contact_url')
+    contact_url: Optional[str] = s.Str(data_key='feed_contact_url')
     '''the URL for information regarding the GTFS dataset'''
-    default_lang: Optional[str] = s.Str('default_lang')
+    default_lang: Optional[str] = s.Str()
     '''the language to use when the rider's language is unknown'''
-    end_date: Optional[date] = s.Date('feed_end_date', format='%Y%m%d')
+    end_date: Optional[date] = s.Date(
+        data_key='feed_end_date', format='%Y%m%d'
+    )
     '''the end date of the information provided in the GTFS dataset'''
-    start_date: Optional[date] = s.Date('feed_start_date', format='%Y%m%d')
+    start_date: Optional[date] = s.Date(
+        data_key='feed_start_date', format='%Y%m%d'
+    )
     '''the start date of the information provided in the GTFS dataset'''
-    version: str = s.Str('feed_version')
+    version: str = s.Str(data_key='feed_version')
     '''the current version of the GTFS dataset'''
 
 

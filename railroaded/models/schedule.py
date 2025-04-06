@@ -33,16 +33,16 @@ class Schedule(s.Seared):
 
     ### ATTRIBUTES ###
     # Foreign IDs
-    service_id: str = s.Str('service_id', required=True)
+    service_id: str = s.Str(required=True)
     '''the unique ID of the service associated with the schedule'''
 
     # Required fields
-    additions: list[pydate] = s.Date('additions', many=True, required=True)
+    additions: list[pydate] = s.Date(many=True, required=True)
     '''a list of dates on which additional service is offered'''
-    exceptions: list[pydate] = s.Date('exceptions', many=True, required=True)
+    exceptions: list[pydate] = s.Date(many=True, required=True)
     '''a list of dates on which service is suspended'''
     ranges: list[DateRange] = s.T(
-        'ranges', schema=DateRange.SCHEMA, many=True, required=True
+        schema=DateRange.SCHEMA, many=True, required=True
     )
     '''a `list` `DateRange` records associated with the schedule'''
 

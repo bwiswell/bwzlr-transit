@@ -60,47 +60,47 @@ class Stop(s.Seared):
     
     ### ATTRIBUTES ###
     # Model ID
-    id: str = s.Str('stop_id', required=True)
+    id: str = s.Str(data_key='stop_id', required=True)
     '''the unique ID of the transit location'''
 
     # Foreign IDs
-    level_id: Optional[str] = s.Str('level_id')
+    level_id: Optional[str] = s.Str()
     '''the unique ID of the level of the transit location'''
-    parent_id: Optional[str] = s.Str('parent_id')
+    parent_id: Optional[str] = s.Str()
     '''the unique ID of the transit location's parent'''
-    zone_id: Optional[str] = s.Str('zone_id')
+    zone_id: Optional[str] = s.Str()
     '''the unique ID of the fare zone of the transit location'''
 
     # Required fields
     accessibility: Accessibility = s.Enum(
-        'wheelchair_boarding',
+        data_key='wheelchair_boarding',
         enum=Accessibility,
         missing=Accessibility.UNKNOWN
     )
     '''the `Accessibility` of the transit location for wheelchair boardings'''
-    name: str = s.Str('stop_name', missing='unnamed')
+    name: str = s.Str(data_key='stop_name', missing='unnamed')
     '''the name of the transit location'''
     type: LocationType = s.Enum(
-        'location_type', 
+        data_key='location_type', 
         enum=LocationType, 
         missing=LocationType.STOP_OR_PLATFORM
     )
     '''the `LocationType` of the transit location'''
 
     # Optional fields
-    code: Optional[str] = s.Str('stop_code')
+    code: Optional[str] = s.Str(data_key='stop_code')
     '''a short text/number identifying the transit location for riders'''
-    desc: Optional[str] = s.Str('stop_desc')
+    desc: Optional[str] = s.Str(data_key='stop_desc')
     '''a description of the transit location'''
-    lat: Optional[float] = s.Float('stop_lat')
+    lat: Optional[float] = s.Float(data_key='stop_lat')
     '''the latitude of the transit location'''
-    lon: Optional[float] = s.Float('stop_lon')
+    lon: Optional[float] = s.Float(data_key='stop_lon')
     '''the longitude of the transit location'''
-    platform_code: Optional[str] = s.Str('platform_code')
+    platform_code: Optional[str] = s.Str()
     '''the unique ID of the platform to stop at'''
-    timezone: Optional[str] = s.Str('stop_timezone')
+    timezone: Optional[str] = s.Str(data_key='stop_timezone')
     '''the timezone of the transit location'''
-    tts_name: Optional[str] = s.Str('tts_stop_name')
+    tts_name: Optional[str] = s.Str(data_key='tts_stop_name')
     '''a text-to-speech readable version of the stop name'''
-    url: Optional[str] = s.Str('stop_url')
+    url: Optional[str] = s.Str(data_key='stop_url')
     '''the URL of a web page about the transit location'''

@@ -23,11 +23,11 @@ class DateRange(s.Seared):
 
     ### ATTRIBUTES ###
     # Required fields
-    end: date = s.Date('end', required=True)
+    end: date = s.Date(required=True)
     '''the end `date` of the range'''
-    schedule: list[bool] = s.Bool('schedule', many=True, required=True)
+    schedule: list[bool] = s.Bool(many=True, required=True)
     '''
     a `list` of `bool` indicating if service is active when indexed by weekday
     '''
-    start: date = s.Date('start', required=True)
+    start: date = s.Date(required=True)
     '''the start `date` of the range'''

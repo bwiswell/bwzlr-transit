@@ -28,7 +28,6 @@ class Timetable(s.Seared):
 
     ### ATTRIBUTES ###
     data: dict[str, StopTime] = s.T(
-        'data',
         schema=StopTime.SCHEMA,
         keyed=True,
         required=True
