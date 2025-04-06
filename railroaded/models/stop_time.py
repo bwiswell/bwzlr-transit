@@ -104,29 +104,35 @@ class StopTime(s.Seared):
     '''the timepoint of the stop'''
 
     # Optional fields
-    arrival_time: Optional[str] = s.Str('arrival_time')
+    arrival_time: Optional[str] = s.Str()
     '''the arrival time at the stop'''
-    departure_time: Optional[str] = s.Str('departure_time')
+    departure_time: Optional[str] = s.Str()
     '''the departure time at the stop'''
-    dist_traveled: Optional[float] = s.Float('shape_dist_traveled')
+    dist_traveled: Optional[float] = s.Float(data_key='shape_dist_traveled')
     '''the distance traveled from the first stop until this stop'''
     dropoff_continuity: Optional[StopContinuity] = s.Enum(
-        'continuous_drop_off', enum=StopContinuity
+        data_key='continuous_drop_off', enum=StopContinuity
     )
     '''the `StopContinuity` for dropoffs at the stop'''
-    dropoff_type: Optional[StopType] = s.Enum('drop_off_type', enum=StopType)
+    dropoff_type: Optional[StopType] = s.Enum(
+        data_key='drop_off_type', enum=StopType
+    )
     '''the `StopType` for dropoffs at the stop'''
-    end_pickup_dropoff: Optional[str] = s.Str('end_pickup_drop_off_window')
+    end_pickup_dropoff: Optional[str] = s.Str(
+        data_key='end_pickup_drop_off_window'
+    )
     '''the end time for pickup and dropoff'''
-    headsign: Optional[str] = s.Str('stop_headsign')
+    headsign: Optional[str] = s.Str(data_key='stop_headsign')
     '''the headsign to display when this stop is the destination'''
     pickup_continuity: Optional[StopContinuity] = s.Enum(
-        'continuous_pickup', enum=StopContinuity
+        data_key='continuous_pickup', enum=StopContinuity
     )
     '''the `StopContinuity` for pickups at the stop'''
-    pickup_type: Optional[StopType] = s.Enum('pickup_type', enum=StopType)
+    pickup_type: Optional[StopType] = s.Enum(enum=StopType)
     '''the `StopType` for pickups at the stop'''
-    start_pickup_dropoff: Optional[str] = s.Str('start_pickup_drop_off_window')
+    start_pickup_dropoff: Optional[str] = s.Str(
+        data_key='start_pickup_drop_off_window'
+    )
     '''the start time for pickup and dropoff'''
 
 

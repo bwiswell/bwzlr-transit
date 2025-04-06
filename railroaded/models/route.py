@@ -61,45 +61,47 @@ class Route(s.Seared):
 
     ### ATTRIBUTES ###
     # Model ID
-    id: str = s.Str('route_id', required=True)
+    id: str = s.Str(data_key='route_id', required=True)
     '''the unique ID of the route'''
     
     # Foreign IDs
-    agency_id: str = s.Str('agency_id', missing='')
+    agency_id: str = s.Str(missing='')
     '''the unique ID of the agency the route belongs to'''
-    network_id: Optional[str] = s.Str('network_id')
+    network_id: Optional[str] = s.Str()
     '''the unique ID of the network the route belongs to'''
 
     # Required fields
-    color: str = s.Str('route_color', missing='FFFFFF', required=True)
+    color: str = s.Str(data_key='route_color', missing='FFFFFF', required=True)
     '''the color associated with the route'''
     dropoffs: StopContinuity = s.Enum(
-        'dropoffs', 
         enum=StopContinuity, 
         missing=StopContinuity.NONE
     )
     '''the continuity of dropoffs along the route'''
     pickups: StopContinuity = s.Enum(
-        'pickups', 
         enum=StopContinuity, 
         missing=StopContinuity.NONE
     )
     '''the continuity of pickups along the route'''
-    sort_idx: int = s.Int('route_sort_order', missing=0)
+    sort_idx: int = s.Int(data_key='route_sort_order', missing=0)
     '''the sort position index of the route'''
-    text_color: Optional[str] = s.Str('route_text_color', missing='000000')
+    text_color: Optional[str] = s.Str(
+        data_key='route_text_color', missing='000000'
+    )
     '''the color to use for text drawn against `Route.color`'''
-    type: TransitType = s.Enum('route_type', enum=TransitType, required=True)
+    type: TransitType = s.Enum(
+        data_key='route_type', enum=TransitType, required=True
+    )
     '''the `TransitType` of the route'''
 
     # Optional fields
-    desc: Optional[str] = s.Str('route_desc')
+    desc: Optional[str] = s.Str(data_key='route_desc')
     '''a description of the route'''
-    long_name: Optional[str] = s.Str('route_long_name')
+    long_name: Optional[str] = s.Str(data_key='route_long_name')
     '''the full name of the route'''
-    short_name: Optional[str] = s.Str('route_sort_name')
+    short_name: Optional[str] = s.Str(data_key='route_sort_name')
     '''the short name of the route'''
-    url: Optional[str] = s.Str('route_url')
+    url: Optional[str] = s.Str(data_key='route_url')
     '''the URL of a web page about the route'''
 
 

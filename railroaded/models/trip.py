@@ -51,39 +51,41 @@ class Trip(s.Seared):
 
     ### ATTRIBUTES ###
     # Model ID
-    id: str = s.Str('trip_id', required=True)
+    id: str = s.Str(data_key='trip_id', required=True)
     '''the unique ID of the trip'''
 
     # Foreign IDs
-    block_id: Optional[str] = s.Str('block_id')
+    block_id: Optional[str] = s.Str()
     '''the unique ID of the block the trip belongs to'''
-    route_id: str = s.Str('route_id', required=True)
+    route_id: str = s.Str(required=True)
     '''the unique ID of the route the trip belongs to'''
-    service_id: str = s.Str('service_id', required=True)
+    service_id: str = s.Str(required=True)
     '''the unique ID of the service the trip belongs to'''
-    shape_id: Optional[str] = s.Str('shape_id')
+    shape_id: Optional[str] = s.Str()
     '''the unique ID of the shape for the trip'''
 
     # Required fields
     accessibility: Accessibility = s.Enum(
-        'wheelchair_accessible', 
+        data_key='wheelchair_accessible', 
         enum=Accessibility, 
         missing=Accessibility.UNKNOWN
     )
     '''the `Accessibility` of the trip'''
     bikes: BikesAllowed = s.Enum(
-        'bikes_allowed', enum=BikesAllowed, missing=BikesAllowed.UNKNOWN
+        data_key='bikes_allowed', 
+        enum=BikesAllowed, 
+        missing=BikesAllowed.UNKNOWN
     )
     '''the `BikesAllowed` of the trip'''
-    timetable: Timetable = s.T('timetable', schema=Timetable.SCHEMA)
+    timetable: Timetable = s.T(schema=Timetable.SCHEMA)
     '''the `Timetable` associated with the trip'''
 
     # Optional fields
-    direction: Optional[bool] = s.Str('direction_id')
+    direction: Optional[bool] = s.Str(data_key='direction_id')
     '''the direction of the trip'''
-    headsign: Optional[str] = s.Str('trip_headsign')
+    headsign: Optional[str] = s.Str(data_key='trip_headsign')
     '''the headsign to display for the trip'''
-    short_name: Optional[str] = s.Str('trip_short_name')
+    short_name: Optional[str] = s.Str(data_key='trip_short_name')
     '''a short name for the trip'''
 
 

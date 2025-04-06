@@ -37,27 +37,27 @@ class Calendar(s.Seared):
     
     ### ATTRIBUTES ###
     # Foreign IDs
-    service_id: str = s.Str('service_id', required=True)
+    service_id: str = s.Str(required=True)
     '''the unique ID of the transit service the schedule is defined for'''
 
     # Required fields
-    end: date = s.Date('end_date', format='%Y%m%d', required=True)
+    end: date = s.Date(data_key='end_date', format='%Y%m%d', required=True)
     '''the end date of the service schedule'''
-    friday: bool = s.Bool('friday', required=True)
+    friday: bool = s.Bool(required=True)
     '''a `bool` indicating if the service is active on Fridays'''
-    monday: bool = s.Bool('monday', required=True)
+    monday: bool = s.Bool(required=True)
     '''a `bool` indicating if the service is active on Mondays'''
-    saturday: bool = s.Bool('saturday', required=True)
+    saturday: bool = s.Bool(required=True)
     '''a `bool` indicating if the service is active on Saturdays'''
-    start: date = s.Date('start_date', format='%Y%m%d', required=True)
+    start: date = s.Date(data_key='start_date', format='%Y%m%d', required=True)
     '''the start date of the service schedule'''
-    sunday: bool = s.Bool('sunday', required=True)
+    sunday: bool = s.Bool(required=True)
     '''a `bool` indicating if the service is active on Sundays'''
-    thursday: bool = s.Bool('thursday', required=True)
+    thursday: bool = s.Bool(required=True)
     '''a `bool` indicating if the service is active on Thursdays'''
-    tuesday: bool = s.Bool('tuesday', required=True)
+    tuesday: bool = s.Bool(required=True)
     '''a `bool` indicating if the service is active on Tuesdays'''
-    wednesday: bool = s.Bool('wednesday', required=True)
+    wednesday: bool = s.Bool(required=True)
     '''a `bool` indicating if the service is active on Wednesdays'''
 
     @property

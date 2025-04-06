@@ -4,7 +4,7 @@ import shutil
 from .gtfs import GTFS
 
 
-__version__ = '0.1.3'
+__version__ = '0.1.4'
 
 
 _TMP = os.path.join(os.path.realpath(os.path.dirname(__file__)), 'tmp')

@@ -30,23 +30,23 @@ class Agency(s.Seared):
     
     ### ATTRIBUTES ###
     # Model ID
-    id: str = s.Str('agency_id', missing='')
+    id: str = s.Str(data_key='agency_id', missing='')
     '''the unique ID of the transit agency'''
     
     # Required fields
-    name: str = s.Str('agency_name', required=True)
+    name: str = s.Str(data_key='agency_name', required=True)
     '''the name of the transit agency'''
-    timezone: str = s.Str('agency_timezone', required=True)
+    timezone: str = s.Str(data_key='agency_timezone', required=True)
     '''the timezone where the transit agency is located'''
-    url: str = s.Str('agency_url', required=True)
+    url: str = s.Str(data_key='agency_url', required=True)
     '''the URL of the transit agency'''
 
     # Optional fields
-    email: Optional[str] = s.Str('agency_email')
+    email: Optional[str] = s.Str(data_key='agency_email')
     '''the customer service email of the transit agency'''
-    fare_url: Optional[str] = s.Str('agency_fare_url')
+    fare_url: Optional[str] = s.Str(data_key='agency_fare_url')
     '''the URL of a fare or ticket website for the transit agency'''
-    lang: Optional[str] = s.Str('agency_lang')
+    lang: Optional[str] = s.Str(data_key='agency_lang')
     '''the primary language used by the transit agency'''
-    phone: Optional[str] = s.Str('agency_phone')
+    phone: Optional[str] = s.Str(data_key='agency_phone')
     '''the voice telephone number for the transit agency'''
